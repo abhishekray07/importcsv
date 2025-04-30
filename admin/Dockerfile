@@ -1,7 +1,7 @@
 # Production-ready Dockerfile for admin app
 
 # Stage 1: Build frontend (csv-import-react package)
-FROM node:18-alpine AS frontend-builder
+FROM node:18 AS frontend-builder
 WORKDIR /app
 
 # Copy frontend source files
@@ -14,7 +14,7 @@ COPY frontend/ ./
 RUN yarn build:react:prod
 
 # Stage 2: Admin app build
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 WORKDIR /app
 
 # Copy package files and install dependencies
@@ -39,7 +39,7 @@ COPY admin/ ./
 RUN npm run build
 
 # Stage 4: Production runner
-FROM node:18-alpine AS runner
+FROM node:18 AS runner
 WORKDIR /app
 
 # Set environment to production
@@ -48,7 +48,7 @@ ENV NODE_ENV production
 # Copy built files from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/package.json ./
 
 # Copy all node_modules from the builder stage
