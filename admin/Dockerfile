@@ -4,9 +4,6 @@
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app
 
-# Install yarn
-RUN npm install -g yarn
-
 # Copy frontend source files
 COPY frontend/package.json ./
 COPY frontend/yarn.lock ./
