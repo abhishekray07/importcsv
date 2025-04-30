@@ -34,6 +34,13 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy admin source files
 COPY admin/ ./
 
+# Create directory for csv-import-react
+RUN mkdir -p ./node_modules/csv-import-react/build
+
+# Copy the built frontend package
+COPY --from=frontend-builder /app/build/ ./node_modules/csv-import-react/build/
+COPY --from=frontend-builder /app/package.json ./node_modules/csv-import-react/
+
 # Build the admin app
 RUN npm run build
 
@@ -50,15 +57,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/package.json ./
 
-# Copy only production dependencies
-COPY --from=deps /app/node_modules ./node_modules
-
-# Create csv-import-react package directory
-RUN mkdir -p ./node_modules/csv-import-react/build
-
-# Copy the built frontend package
-COPY --from=frontend-builder /app/build/ ./node_modules/csv-import-react/build/
-COPY --from=frontend-builder /app/package.json ./node_modules/csv-import-react/
+# Copy all node_modules from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
 
 # Create a non-root user and set permissions
 RUN addgroup --system --gid 1001 nodejs
