@@ -88,16 +88,11 @@ export default function ImportersPage() {
   const { isSignedIn, isLoaded: authLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
   useEffect(() => {
-    console.log('Importers page auth state:', { isSignedIn, authLoaded, user: user?.id });
-
     if (isSignedIn && authLoaded) {
-      console.log('User is authenticated, fetching importers...');
       fetchImporters();
     } else if (authLoaded && !isSignedIn) {
-      console.warn('User is not authenticated and auth loading is complete');
       // Redirect to sign-in if not signed in
       router.push('/sign-in');
     }
@@ -105,34 +100,20 @@ export default function ImportersPage() {
 
   // Fetch importers logic
   const fetchImporters = async () => {
-    console.log('Starting to fetch importers...');
     setIsLoading(true);
     setError(null);
 
     try {
       // Use the API client to get importers
       // The token handling and refresh is done automatically by the client
-      console.log('Calling importersApi.getImporters()...');
       const data = await importersApi.getImporters();
-      console.log('Received importers data:', data);
       setImporters(data);
     } catch (err: any) {
-      console.error('Error fetching importers:', err);
-
-      if (err.response) {
-        console.error('API response error:', {
-          status: err.response.status,
-          data: err.response.data,
-          headers: err.response.headers
-        });
-      }
-
       setError(err.message || 'An error occurred while fetching importers');
 
       // If the error is authentication-related and not handled by the client,
       // redirect to login
       if (err.response && err.response.status === 401) {
-        console.warn('Unauthorized (401) response, redirecting to login page');
         router.push('/sign-in');
       }
     } finally {
@@ -199,8 +180,6 @@ export default function ImportersPage() {
       setIsCreateDialogOpen(false);
       fetchImporters();
     } catch (err: any) {
-      console.error('Error creating importer:', err);
-
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while creating the importer';
       if (err.response && err.response.data && err.response.data.detail) {
@@ -243,8 +222,6 @@ export default function ImportersPage() {
       setImporterToEdit(null);
       fetchImporters();
     } catch (err: any) {
-      console.error('Error updating importer:', err);
-
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while updating the importer';
       if (err.response && err.response.data && err.response.data.detail) {
@@ -270,8 +247,6 @@ export default function ImportersPage() {
       setImporterToDelete(null);
       fetchImporters();
     } catch (err: any) {
-      console.error('Error deleting importer:', err);
-
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while deleting the importer';
       if (err.response && err.response.data && err.response.data.detail) {
