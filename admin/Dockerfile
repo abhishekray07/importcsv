@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy frontend source files
 COPY frontend/package.json ./
 COPY frontend/yarn.lock ./
-RUN yarn install
+RUN yarn install --ignore-engines
 COPY frontend/ ./
 
 # Build the frontend package
@@ -22,7 +22,7 @@ COPY admin/package.json ./
 COPY admin/package-lock.json ./
 
 # Install production dependencies
-RUN npm ci --only=production
+RUN npm ci --only=production --legacy-peer-deps
 
 # Stage 3: Builder for admin app
 FROM node:18-alpine AS builder
