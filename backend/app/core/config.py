@@ -95,6 +95,11 @@ class BaseAppSettings(BaseSettings):
         default_factory=lambda: os.getenv("CLERK_JWT_PUBLIC_KEY", "")
     )
 
+    # Host settings for TrustedHostMiddleware
+    ALLOWED_HOSTS: List[str] = Field(
+        default_factory=lambda: os.getenv("ALLOWED_HOSTS", "*").split(",")
+    )
+
     @field_validator("SECRET_KEY")
     @classmethod
     def secret_key_must_be_secure(cls, v):
