@@ -21,8 +21,8 @@ WORKDIR /app
 COPY admin/package.json ./
 COPY admin/package-lock.json ./
 
-# Install production dependencies
-RUN npm ci --only=production --legacy-peer-deps
+# Install all dependencies (including dev dependencies) for build
+RUN npm ci --legacy-peer-deps
 
 # Stage 3: Builder for admin app
 FROM node:18-alpine AS builder
