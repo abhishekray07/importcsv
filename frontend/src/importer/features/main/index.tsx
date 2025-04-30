@@ -20,6 +20,7 @@ import Uploader from "../uploader";
 import Validation from '../validation/Validation';
 import { PiX } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function Main(props: CSVImporterProps) {
   const {
@@ -30,7 +31,7 @@ export default function Main(props: CSVImporterProps) {
     showDownloadTemplateButton,
     skipHeaderRowSelection,
     importerKey,
-    backendUrl = process.env.BACKEND_URL || 'http://localhost:8000',
+    backendUrl = config.apiBaseUrl,
     user,
     metadata,
   } = props;
@@ -87,32 +88,32 @@ export default function Main(props: CSVImporterProps) {
         setIsLoadingSchema(true);
         // Fetch schema from the backend
         const response = await fetch(`${backendUrl}/api/v1/imports/key/schema?importer_key=${importerKey}`);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch schema: ${response.statusText}`);
         }
-        
+
         const schemaData = await response.json();
         console.log('Fetched schema from backend:', schemaData);
-        
+
         // Store the include_unmatched_columns setting from the importer configuration
         if (schemaData.include_unmatched_columns !== undefined) {
           setIncludeUnmatchedColumns(schemaData.include_unmatched_columns);
           console.log('Include unmatched columns setting:', schemaData.include_unmatched_columns);
         }
-        
+
         // Store the filter_invalid_rows setting from the importer configuration
         if (schemaData.filter_invalid_rows !== undefined) {
           setFilterInvalidRows(schemaData.filter_invalid_rows);
           console.log('Filter invalid rows setting:', schemaData.filter_invalid_rows);
         }
-        
+
         // Store the disable_on_invalid_rows setting from the importer configuration
         if (schemaData.disable_on_invalid_rows !== undefined) {
           setDisableOnInvalidRows(schemaData.disable_on_invalid_rows);
           console.log('Disable on invalid rows setting:', schemaData.disable_on_invalid_rows);
         }
-        
+
         // Convert the schema to the format expected by the importer
         const schemaTemplate = {
           columns: schemaData.fields.map((field: any) => {
@@ -129,7 +130,7 @@ export default function Main(props: CSVImporterProps) {
           })
         };
         console.log('Converted schema template:', schemaTemplate);
-        
+
         const [parsedTemplate, parsedTemplateError] = convertRawTemplate(schemaTemplate);
         if (parsedTemplateError) {
           setInitializationError(parsedTemplateError);
@@ -194,16 +195,16 @@ export default function Main(props: CSVImporterProps) {
         data: {},
         unmapped_data: {}
       };
-      
+
       // Process each cell in the row
       row.values.forEach((value, valueIndex) => {
         const mapping = columnMapping[valueIndex];
         const headerValue = headerRow.values[valueIndex];
-        
+
         // Normalize the value (handle empty/null/NaN)
-        const normalizedValue = (value === undefined || value === null || value === '' || 
+        const normalizedValue = (value === undefined || value === null || value === '' ||
           (typeof value === 'number' && isNaN(value))) ? "" : value.toString();
-        
+
         if (mapping && mapping.include) {
           // Add to mapped data
           resultingRow.data[mapping.key] = normalizedValue;
@@ -213,7 +214,7 @@ export default function Main(props: CSVImporterProps) {
           resultingRow.unmapped_data[columnKey] = normalizedValue;
         }
       });
-      
+
       return resultingRow;
     });
 
@@ -285,7 +286,7 @@ export default function Main(props: CSVImporterProps) {
 
         // Call onComplete with the simplified backend response
 
-        
+
         // The backend now returns a simplified response with just success/failure status
         // and a job_id that can be used to track the job
         if (result.success) {

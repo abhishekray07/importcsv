@@ -3,9 +3,10 @@
  * Includes automatic token refresh functionality
  */
 import axios from 'axios';
+import { getApiBaseUrl } from '../config';
 
 // Base URL for API requests
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const API_BASE_URL = getApiBaseUrl();
 
 // Create axios instance
 const apiClient = axios.create({
@@ -33,7 +34,7 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-  
+
   failedQueue = [];
 };
 
@@ -41,31 +42,31 @@ const processQueue = (error, token = null) => {
 const refreshAccessToken = async () => {
   try {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    
+
     if (!refreshToken) {
       return Promise.reject('No refresh token available');
     }
-    
+
     const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, {
       refresh_token: refreshToken
     });
-    
+
     const { access_token } = response.data;
-    
+
     // Update the token in localStorage
     localStorage.setItem(AUTH_TOKEN_KEY, access_token);
-    
+
     return access_token;
   } catch (error) {
     // If refresh fails, clear tokens and redirect to login
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    
+
     // Redirect to login page if in browser environment
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }
-    
+
     return Promise.reject(error);
   }
 };
@@ -87,15 +88,15 @@ apiClient.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
-    
+
     // If the error is not 401 or we've already tried to refresh, reject
     if (!error.response || error.response.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
-    
+
     // Set flag to prevent retrying this request again
     originalRequest._retry = true;
-    
+
     // If we're already refreshing, add this request to the queue
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
@@ -107,19 +108,19 @@ apiClient.interceptors.response.use(
         })
         .catch(err => Promise.reject(err));
     }
-    
+
     isRefreshing = true;
-    
+
     try {
       // Attempt to refresh the token
       const newToken = await refreshAccessToken();
-      
+
       // Update the authorization header
       originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-      
+
       // Process any queued requests with the new token
       processQueue(null, newToken);
-      
+
       return apiClient(originalRequest);
     } catch (refreshError) {
       // If refresh fails, process queue with error
@@ -145,25 +146,25 @@ export const authApi = {
     const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
-    
+
     const response = await axios.post(`${API_BASE_URL}/api/v1/auth/jwt/login`, formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    
+
     // Store tokens in localStorage
     if (response.data.access_token) {
       localStorage.setItem(AUTH_TOKEN_KEY, response.data.access_token);
     }
-    
+
     if (response.data.refresh_token) {
       localStorage.setItem(REFRESH_TOKEN_KEY, response.data.refresh_token);
     }
-    
+
     return response.data;
   },
-  
+
   /**
    * Logout the current user
    */
@@ -178,7 +179,7 @@ export const authApi = {
       localStorage.removeItem(REFRESH_TOKEN_KEY);
     }
   },
-  
+
   /**
    * Get current user information
    * @returns {Promise<Object>} - User information
@@ -201,7 +202,7 @@ export const schemaApi = {
     const response = await apiClient.get('/schemas/');
     return response.data;
   },
-  
+
   /**
    * Get schema template for CSV importer
    * @param {number} schemaId - Schema ID
@@ -229,10 +230,10 @@ export const importApi = {
       validData: importData.validData,
       invalidData: importData.invalidData,
     });
-    
+
     return response.data;
   },
-  
+
   /**
    * Get import job status
    * @param {number} jobId - Import job ID
