@@ -21,6 +21,10 @@ class User(SQLAlchemyBaseUserTable[uuid.UUID], Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+    # Clerk integration
+    clerk_user_id = Column(String, unique=True, index=True, nullable=True)
+    profile_image = Column(String, nullable=True)
+
     # Relationships - using simple string references
     importers = relationship("Importer", back_populates="user")
     import_jobs = relationship("ImportJob", back_populates="user")

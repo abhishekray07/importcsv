@@ -1,36 +1,42 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth as useClerkAuth, UserButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { isLoaded, isSignedIn } = useClerkAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login');
-    } else if (!isLoading && isAuthenticated) {
+    if (isLoaded && !isSignedIn) {
+      router.push('/');
+    } else if (isLoaded && isSignedIn) {
       // Redirect to importers page
       router.push('/dashboard/importers');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isSignedIn, isLoaded, router]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
-
-  if (isLoading) {
+  if (!isLoaded) {
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <p>Loading...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  if (!isSignedIn) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Please sign in to access the dashboard</p>
+      </div>
     );
   }
 
-  if (!isAuthenticated) {
+  // We already checked if the user is signed in above, so this is redundant
+  // but we'll keep it for clarity
+  if (!isSignedIn) {
       return null;
   }
 

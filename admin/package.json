@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.18.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@radix-ui/react-alert-dialog": "^1.1.7",
