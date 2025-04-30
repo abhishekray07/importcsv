@@ -1,32 +1,86 @@
-# Simple Dockerfile for admin app
-FROM node:18-alpine
+# Production-ready Dockerfile for admin app using multi-stage builds
 
-# Set working directory
+# Stage 1: Build frontend (csv-import-react package)
+FROM node:18-alpine AS frontend-builder
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Install yarn
+RUN npm install -g yarn
+
+# Copy frontend source files
+COPY frontend/package.json ./
+COPY frontend/yarn.lock ./
+RUN yarn install
+COPY frontend/ ./
+
+# Build the frontend package
+RUN yarn build:react:prod
+
+# Stage 2: Dependencies for admin app
+FROM node:18-alpine AS deps
+WORKDIR /app
+
+# Copy package files
 COPY admin/package.json ./
 COPY admin/package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Install production dependencies
+RUN npm ci --only=production
 
-# Remove the csv-import-react package if it exists
-RUN rm -rf ./node_modules/csv-import-react
+# Stage 3: Builder for admin app
+FROM node:18-alpine AS builder
+WORKDIR /app
 
-# Create the directory structure for the csv-import-react package
+# Copy dependencies
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy admin source files
+COPY admin/ ./
+
+# Build the admin app
+RUN npm run build
+
+# Stage 4: Production runner
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# Set environment to production
+ENV NODE_ENV production
+
+# Copy built files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/package.json ./
+
+# Copy only production dependencies
+COPY --from=deps /app/node_modules ./node_modules
+
+# Create csv-import-react package directory
 RUN mkdir -p ./node_modules/csv-import-react/build
 
-# Copy the pre-built frontend package
-# Note: These files should be built locally before running docker build
-COPY frontend/package.json ./node_modules/csv-import-react/
-COPY frontend/build/ ./node_modules/csv-import-react/build/
+# Copy the built frontend package
+COPY --from=frontend-builder /app/build/ ./node_modules/csv-import-react/build/
+COPY --from=frontend-builder /app/package.json ./node_modules/csv-import-react/
 
-# Copy admin source files (after handling node_modules)
-COPY admin/ ./
+# Create a non-root user and set permissions
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+RUN chown -R nextjs:nodejs /app/.next
+USER nextjs
 
 # Expose port
 EXPOSE 3000
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+# Environment variables should be passed at runtime
+# For example: docker run -p 3000:3000 --env-file .env.production admin-app
+
+
+# Environment variables
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG CLERK_SECRET_KEY
+ENV NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+ENV NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# Start the production server
+CMD ["npm", "start"]
