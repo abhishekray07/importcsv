@@ -23,6 +23,7 @@ from app.auth.token import (
     revoke_token,
     revoke_all_user_tokens,
 )
+from app.auth.clerk import get_current_active_user as clerk_current_active_user
 
 router = APIRouter()
 
@@ -306,4 +307,25 @@ async def get_user_me(
         "is_active": user.is_active,
         "is_superuser": user.is_superuser,
         "is_verified": user.is_verified,
+        "clerk_user_id": user.clerk_user_id,
+        "profile_image": user.profile_image,
+    }
+
+
+@router.get("/clerk/me", response_model=Dict[str, Any])
+async def get_clerk_user_me(
+    user: UserModel = Depends(clerk_current_active_user),
+):
+    """
+    Get the current user's information using Clerk authentication
+    """
+    return {
+        "id": user.id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "is_active": user.is_active,
+        "is_superuser": user.is_superuser,
+        "is_verified": user.is_verified,
+        "clerk_user_id": user.clerk_user_id,
+        "profile_image": user.profile_image,
     }

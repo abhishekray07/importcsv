@@ -41,6 +41,12 @@ export default function DashboardLayout({
       icon: <LayoutGrid className="h-5 w-5 mr-2" />,
       exact: true
     },
+    {
+      name: 'Importers',
+      href: '/dashboard/importers',
+      icon: <FileSpreadsheet className="h-5 w-5 mr-2" />,
+      exact: false
+    },
   ];
 
   // Check if a nav item is active

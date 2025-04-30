@@ -6,7 +6,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 
-from app.auth.users import get_current_active_user
+from app.auth.clerk import get_current_active_user
 from app.db.base import get_db
 from app.models.user import User
 from app.models.import_job import ImportJob as ImportJobModel, ImportStatus

@@ -67,6 +67,7 @@ class BaseAppSettings(BaseSettings):
     # Clerk authentication settings
     CLERK_API_KEY: Optional[str] = Field(default_factory=lambda: os.getenv("CLERK_API_KEY", ""))
     CLERK_WEBHOOK_SECRET: Optional[str] = Field(default_factory=lambda: os.getenv("CLERK_WEBHOOK_SECRET", ""))
+    CLERK_JWT_PUBLIC_KEY: str = Field(default_factory=lambda: os.getenv("CLERK_JWT_PUBLIC_KEY", ""))
 
     @field_validator("SECRET_KEY")
     @classmethod

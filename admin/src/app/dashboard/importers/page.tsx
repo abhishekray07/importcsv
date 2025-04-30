@@ -36,7 +36,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useAuth } from '@/context/AuthContext';
+import { useUser, useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import apiClient, { importersApi } from '@/utils/apiClient';
 
@@ -85,34 +85,55 @@ export default function ImportersPage() {
   const [importerToDelete, setImporterToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const { token, logout, refreshToken } = useAuth();
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
   useEffect(() => {
-    if (token) {
+    console.log('Importers page auth state:', { isSignedIn, authLoaded, user: user?.id });
+
+    if (isSignedIn && authLoaded) {
+      console.log('User is authenticated, fetching importers...');
       fetchImporters();
+    } else if (authLoaded && !isSignedIn) {
+      console.warn('User is not authenticated and auth loading is complete');
+      // Redirect to sign-in if not signed in
+      router.push('/sign-in');
     }
-  }, [token]);
+  }, [isSignedIn, authLoaded, user?.id]);
 
   // Fetch importers logic
   const fetchImporters = async () => {
+    console.log('Starting to fetch importers...');
     setIsLoading(true);
     setError(null);
 
     try {
       // Use the API client to get importers
       // The token handling and refresh is done automatically by the client
+      console.log('Calling importersApi.getImporters()...');
       const data = await importersApi.getImporters();
+      console.log('Received importers data:', data);
       setImporters(data);
     } catch (err: any) {
       console.error('Error fetching importers:', err);
+
+      if (err.response) {
+        console.error('API response error:', {
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+      }
+
       setError(err.message || 'An error occurred while fetching importers');
-      
+
       // If the error is authentication-related and not handled by the client,
       // redirect to login
       if (err.response && err.response.status === 401) {
-        router.push('/login');
+        console.warn('Unauthorized (401) response, redirecting to login page');
+        router.push('/sign-in');
       }
     } finally {
       setIsLoading(false);
@@ -166,20 +187,20 @@ export default function ImportersPage() {
 
   const handleSaveImporter = async (importerName: string, fields: ImporterField[]) => {
     setSaveError(null);
-    
+
     try {
       // Use the API client to create an importer
       await importersApi.createImporter({
         name: importerName,
         fields: fields,
       });
-      
+
       // Close dialog and refresh importers list
       setIsCreateDialogOpen(false);
       fetchImporters();
     } catch (err: any) {
       console.error('Error creating importer:', err);
-      
+
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while creating the importer';
       if (err.response && err.response.data && err.response.data.detail) {
@@ -187,7 +208,7 @@ export default function ImportersPage() {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setSaveError(errorMessage);
     }
   };
@@ -209,21 +230,21 @@ export default function ImportersPage() {
   const handleUpdateImporter = async (importerName: string, fields: ImporterField[]) => {
     if (!importerToEdit) return;
     setSaveError(null);
-    
+
     try {
       // Use the API client to update an importer
       await importersApi.updateImporter(importerToEdit.id, {
         name: importerName,
         fields: fields,
       });
-      
+
       // Close dialog and refresh importers list
       setIsEditDialogOpen(false);
       setImporterToEdit(null);
       fetchImporters();
     } catch (err: any) {
       console.error('Error updating importer:', err);
-      
+
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while updating the importer';
       if (err.response && err.response.data && err.response.data.detail) {
@@ -231,7 +252,7 @@ export default function ImportersPage() {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setSaveError(errorMessage);
     }
   };
@@ -240,17 +261,17 @@ export default function ImportersPage() {
   const handleDeleteImporter = async () => {
     if (!importerToDelete) return;
     setDeleteError(null);
-    
+
     try {
       // Use the API client to delete an importer
       await importersApi.deleteImporter(importerToDelete);
-      
+
       // Reset state and refresh importers list
       setImporterToDelete(null);
       fetchImporters();
     } catch (err: any) {
       console.error('Error deleting importer:', err);
-      
+
       // Extract error message from API response if available
       let errorMessage = 'An error occurred while deleting the importer';
       if (err.response && err.response.data && err.response.data.detail) {
@@ -258,7 +279,7 @@ export default function ImportersPage() {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setDeleteError(errorMessage);
     }
   };
@@ -324,16 +345,16 @@ export default function ImportersPage() {
         setFormError('Column type is required');
         return;
       }
-      
+
       // Check for duplicate field names
       if (fields.some(f => f.name === newField.name)) {
         setFormError(`Column name '${newField.name}' already exists`);
         return;
       }
-      
+
       // Add the field to the list
       setFields(prev => [...prev, { ...newField }]);
-      
+
       // Reset the new field form
       setNewField({
         name: '',
@@ -347,7 +368,7 @@ export default function ImportersPage() {
         validation_error_message: '',
         validation_format: ''
       });
-      
+
       // Clear any errors and close the dialog
       setFormError(null);
       setShowAddFieldDialog(false);
@@ -428,9 +449,9 @@ export default function ImportersPage() {
                         </td>
                         <td className="px-4 py-3 text-base">{field.description || '-'}</td>
                         <td className="px-4 py-3 text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => removeFieldHandler(field.name)}
                             className="text-gray-500 hover:text-red-600"
                           >
@@ -464,8 +485,8 @@ export default function ImportersPage() {
           </Button>
 
           {/* Add Field Dialog */}
-          <Dialog 
-            open={showAddFieldDialog} 
+          <Dialog
+            open={showAddFieldDialog}
             onOpenChange={(open) => {
               setShowAddFieldDialog(open);
               if (!open) setFormError(null);
@@ -485,7 +506,7 @@ export default function ImportersPage() {
                     {formError}
                   </div>
                 )}
-                
+
                 {/* Column Name */}
                 <div className="space-y-2">
                   <Label htmlFor="fieldName" className="text-base font-medium">Column Name</Label>
@@ -694,8 +715,8 @@ export default function ImportersPage() {
         <h1 className="text-3xl font-bold tracking-tight">Importers</h1>
 
         {/* Create Importer Button */}
-        <Button 
-          className="font-medium" 
+        <Button
+          className="font-medium"
           onClick={() => router.push('/dashboard/importers/new')}
         >
           Create Importer

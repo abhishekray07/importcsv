@@ -3,6 +3,7 @@
  * Includes automatic token refresh functionality
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { getClerkToken } from './clerkTokenGetter';
 
 // Base URL for API requests
 const API_BASE_URL =
@@ -109,25 +110,62 @@ const refreshAccessToken = async (): Promise<string> => {
   }
 };
 
+
+
+// Global token getter function that can be set from outside
+let globalTokenGetter: () => Promise<string | null> = async () => {
+  console.warn('No token getter has been set yet');
+  return null;
+};
+
+// Function to set the token getter
+export const setTokenGetter = (getter: () => Promise<string | null>) => {
+  console.log('Setting global token getter function');
+  globalTokenGetter = getter;
+};
+
 // Request interceptor to add auth token to requests
 apiClient.interceptors.request.use(
-  (config) => {
-    // Only run in browser environment
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  async (config) => {
+    console.log('API Request:', config.method, config.url);
+    
+    try {
+      // Get the token using the global token getter
+      const token = await globalTokenGetter();
+      console.log('Token available:', token ? 'Yes' : 'No');
+      
+      // Add the token to the request headers if available
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;
+        console.log('Added Authorization header with Bearer token');
+      } else {
+        console.warn('No token available for request - make sure TokenSetup component is mounted');
+        
+        // For debugging - log if we're in a component that should have auth
+        if (config.url?.includes('/importers') || config.url?.includes('/imports')) {
+          console.warn('Attempted to access protected endpoint without token');
+        }
       }
+    } catch (error) {
+      console.error('Error getting token:', error);
     }
+    
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    console.error('API Request error:', error);
+    return Promise.reject(error);
+  },
 );
 
 // Response interceptor to handle token refresh on 401 errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response.status, response.config.url);
+    return response;
+  },
   async (error: AxiosError) => {
+    console.error('API Response error:', error.response?.status, error.config?.url, error.message);
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
