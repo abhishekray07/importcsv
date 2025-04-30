@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import dynamic from "next/dynamic";
+import { importersApi } from "@/utils/apiClient";
 
 // Define types for our schema and data
 interface ImporterField {
@@ -42,51 +42,54 @@ const CSVImporter = dynamic(
   { ssr: false },
 );
 
+// Separate component for the CSVImporter to prevent re-renders
+function ImporterComponent({ importerKey, onComplete }: { importerKey: string, onComplete: (data: ImportData) => void }) {
+  // Using useMemo to ensure the component doesn't re-render unnecessarily
+  return useMemo(() => (
+    <CSVImporter
+      isModal={false}
+      darkMode={false}
+      primaryColor="#0284c7"
+      showDownloadTemplateButton={true}
+      skipHeaderRowSelection={false}
+      importerKey={importerKey}
+      onComplete={onComplete}
+    />
+  ), [importerKey, onComplete]);
+}
+
 export default function ImporterPreviewPage() {
   const params = useParams();
-  const router = useRouter();
-  const { token, refreshToken, logout } = useAuth();
+  const { isSignedIn } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [importer, setImporter] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const handleImportComplete = async (data: ImportData) => {
+  // Use useCallback to create a stable reference to the callback function
+  const handleImportComplete = useCallback(async (data: ImportData) => {
     // Process import data
-  };
+  }, []);
 
   // Fetch importer details to get the key
   useEffect(() => {
-    const fetchImporterDetails = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
-          }/api/v1/importers/${params.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch importer details");
-        }
-
-        const data = await response.json();
-        setImporter(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (token) {
-      fetchImporterDetails();
-    }
-  }, [params.id, token]);
+    if (!isSignedIn) return;
+    
+    let isMounted = true;
+    setLoading(true);
+    
+    importersApi.getImporter(params.id as string)
+      .then(data => {
+        if (isMounted) setImporter(data);
+      })
+      .catch(err => {
+        if (isMounted) setError(err instanceof Error ? err.message : "An error occurred");
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    
+    return () => { isMounted = false; };
+  }, [params.id, isSignedIn]);
 
   if (error)
     return (
@@ -141,14 +144,9 @@ export default function ImporterPreviewPage() {
           <>
             <div className="w-full min-h-[500px]">
               {importer?.key && (
-                <CSVImporter
-                  isModal={false}
-                  darkMode={false}
-                  primaryColor="#0284c7"
-                  showDownloadTemplateButton={true}
-                  skipHeaderRowSelection={false}
-                  importerKey={importer.key}
-                  onComplete={handleImportComplete}
+                <ImporterComponent 
+                  importerKey={importer.key} 
+                  onComplete={handleImportComplete} 
                 />
               )}
             </div>
