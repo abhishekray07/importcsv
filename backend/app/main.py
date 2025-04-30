@@ -103,13 +103,6 @@ app.add_middleware(
     https_only=settings.ENVIRONMENT == "production",
 )
 
-# In production, add TrustedHostMiddleware
-if settings.ENVIRONMENT == "production":
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
-
-# All FastAPI Users routes are now included via api_router
-# This avoids duplication and makes route management cleaner
-
 # Include API routes
 app.include_router(api_router, prefix="/api")
 
