@@ -1,4 +1,4 @@
-# Production-ready Dockerfile for admin app using multi-stage builds
+# Production-ready Dockerfile for admin app
 
 # Stage 1: Build frontend (csv-import-react package)
 FROM node:18-alpine AS frontend-builder
@@ -13,33 +13,27 @@ COPY frontend/ ./
 # Build the frontend package
 RUN yarn build:react:prod
 
-# Stage 2: Dependencies for admin app
-FROM node:18-alpine AS deps
-WORKDIR /app
-
-# Copy package files
-COPY admin/package.json ./
-COPY admin/package-lock.json ./
-
-# Install all dependencies (including dev dependencies) for build
-RUN npm ci --legacy-peer-deps
-
-# Stage 3: Builder for admin app
+# Stage 2: Admin app build
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy dependencies
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files and install dependencies
+COPY admin/package.json ./
+COPY admin/package-lock.json ./
+RUN npm ci --legacy-peer-deps
 
-# Copy admin source files
-COPY admin/ ./
+# Remove the csv-import-react package if it exists
+RUN rm -rf ./node_modules/csv-import-react
 
-# Create directory for csv-import-react
+# Create the directory structure for the csv-import-react package
 RUN mkdir -p ./node_modules/csv-import-react/build
 
 # Copy the built frontend package
 COPY --from=frontend-builder /app/build/ ./node_modules/csv-import-react/build/
 COPY --from=frontend-builder /app/package.json ./node_modules/csv-import-react/
+
+# Copy admin source files (after handling node_modules)
+COPY admin/ ./
 
 # Build the admin app
 RUN npm run build
@@ -68,10 +62,6 @@ USER nextjs
 
 # Expose port
 EXPOSE 3000
-
-# Environment variables should be passed at runtime
-# For example: docker run -p 3000:3000 --env-file .env.production admin-app
-
 
 # Environment variables
 ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
