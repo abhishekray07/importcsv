@@ -8,6 +8,11 @@ const getEnvironment = () => {
   if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV) {
     return process.env.NODE_ENV;
   }
+  
+  // Check if we're in a build for npm package (set in package.json scripts)
+  if (process.env.NPM_PACKAGE_BUILD === 'true') {
+    return 'production';
+  }
 
   // Default to development if environment can't be determined
   return 'development';

@@ -31,7 +31,9 @@ export default {
     }),
     replace({
       preventAssignment: true,
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.NPM_PACKAGE_BUILD': JSON.stringify(process.env.NPM_PACKAGE_BUILD || 'false'),
+      delimiters: ['', '']
     }),
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
