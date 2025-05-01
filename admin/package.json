@@ -26,7 +26,6 @@
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "csv-import-react": "file:.yalc/csv-import-react",
     "framer-motion": "^12.7.4",
     "logrocket": "^10.0.0",
     "lucide-react": "^0.488.0",
