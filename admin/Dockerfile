@@ -17,6 +17,9 @@ RUN yarn build:react:prod
 FROM node:18 AS builder
 WORKDIR /app
 
+# Set environment variables for build time
+ENV NEXT_PUBLIC_BACKEND_URL=https://api.importcsv.com
+
 # Copy package files and install dependencies
 COPY admin/package.json ./
 COPY admin/package-lock.json ./
@@ -68,6 +71,7 @@ ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 ARG CLERK_SECRET_KEY
 ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
 ENV CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+# Runtime environment variables
 ENV NEXT_PUBLIC_BACKEND_URL=https://api.importcsv.com
 ENV NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 ENV NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
