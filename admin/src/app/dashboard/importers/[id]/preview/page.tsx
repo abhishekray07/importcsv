@@ -38,7 +38,7 @@ interface ImportData {
 // Dynamically import the CSV Importer component directly from the library
 const CSVImporter = dynamic(
   () =>
-    import("csv-import-react").then((mod) => ({ default: mod.CSVImporter })),
+    import("@importcsv/react").then((mod) => ({ default: mod.CSVImporter })),
   { ssr: false },
 );
 
@@ -73,10 +73,10 @@ export default function ImporterPreviewPage() {
   // Fetch importer details to get the key
   useEffect(() => {
     if (!isSignedIn) return;
-    
+
     let isMounted = true;
     setLoading(true);
-    
+
     importersApi.getImporter(params.id as string)
       .then(data => {
         if (isMounted) setImporter(data);
@@ -87,7 +87,7 @@ export default function ImporterPreviewPage() {
       .finally(() => {
         if (isMounted) setLoading(false);
       });
-    
+
     return () => { isMounted = false; };
   }, [params.id, isSignedIn]);
 
@@ -144,9 +144,9 @@ export default function ImporterPreviewPage() {
           <>
             <div className="w-full min-h-[500px]">
               {importer?.key && (
-                <ImporterComponent 
-                  importerKey={importer.key} 
-                  onComplete={handleImportComplete} 
+                <ImporterComponent
+                  importerKey={importer.key}
+                  onComplete={handleImportComplete}
                 />
               )}
             </div>

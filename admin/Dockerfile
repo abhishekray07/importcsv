@@ -1,7 +1,7 @@
 # Production-ready Dockerfile for admin app
 
 # Stage 1: Build frontend (csv-import-react package)
-FROM node:18 AS frontend-builder
+FROM node:20 AS frontend-builder
 WORKDIR /app
 
 # Copy frontend source files
@@ -14,11 +14,19 @@ COPY frontend/ ./
 RUN yarn build:react:prod
 
 # Stage 2: Admin app build
-FROM node:18 AS builder
+FROM node:20 AS builder
 WORKDIR /app
 
 # Set environment variables for build time
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG CLERK_SECRET_KEY
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+ENV CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
 ENV NEXT_PUBLIC_BACKEND_URL=https://api.importcsv.com
+ENV NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+ENV NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+ENV NEXT_PUBLIC_POSTHOG_KEY=phc_LkCjHOTsu2RZoYxnyPWEbycR8nFJlGZgtnl4bDQIws6
+ENV NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
 # Copy package files and install dependencies
 COPY admin/package.json ./
@@ -42,7 +50,7 @@ COPY admin/ ./
 RUN npm run build
 
 # Stage 4: Production runner
-FROM node:18 AS runner
+FROM node:20 AS runner
 WORKDIR /app
 
 # Set environment to production
@@ -65,16 +73,6 @@ USER nextjs
 
 # Expose port
 EXPOSE 3000
-
-# Environment variables
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ARG CLERK_SECRET_KEY
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-ENV CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
-# Runtime environment variables
-ENV NEXT_PUBLIC_BACKEND_URL=https://api.importcsv.com
-ENV NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-ENV NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # Start the production server
 CMD ["npm", "start"]
