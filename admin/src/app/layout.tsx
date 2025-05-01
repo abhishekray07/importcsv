@@ -4,6 +4,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { ApiProvider } from "@/components/ApiProvider";
+import { PostHogProvider } from "@/components/PostHogProvider";
+import { LogRocketProvider } from "@/components/LogRocketProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,19 +24,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClerkProvider dynamic>
-          <ApiProvider>
-            {children}
-            <Toaster />
-          </ApiProvider>
+          <PostHogProvider>
+            <LogRocketProvider>
+              <ApiProvider>
+                {children}
+                <Toaster />
+              </ApiProvider>
+            </LogRocketProvider>
+          </PostHogProvider>
         </ClerkProvider>
       </body>
     </html>
