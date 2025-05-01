@@ -25,15 +25,15 @@ COPY admin/package.json ./
 COPY admin/package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
-# Remove the csv-import-react package if it exists
-RUN rm -rf ./node_modules/csv-import-react
+# Remove the @importcsv/react package if it exists
+RUN rm -rf ./node_modules/@importcsv/react
 
-# Create the directory structure for the csv-import-react package
-RUN mkdir -p ./node_modules/csv-import-react/build
+# Create the directory structure for the @importcsv/react package
+RUN mkdir -p ./node_modules/@importcsv/react/build
 
 # Copy the built frontend package
-COPY --from=frontend-builder /app/build/ ./node_modules/csv-import-react/build/
-COPY --from=frontend-builder /app/package.json ./node_modules/csv-import-react/
+COPY --from=frontend-builder /app/build/ ./node_modules/@importcsv/react/build/
+COPY --from=frontend-builder /app/package.json ./node_modules/@importcsv/react/
 
 # Copy admin source files (after handling node_modules)
 COPY admin/ ./
