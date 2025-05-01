@@ -47,7 +47,7 @@ Data importing is a critical but challenging part of any business application. I
 
 ## ✨ Key Features
 
-- **Smart Column Mapping** - AI-powered matching of source columns to destination fields
+- **Smart Column Mapping** - Fuzzy matching of source columns to destination fields
 - **Multi-Format Support** - Import from CSV, XLS, XLSX, and TSV files
 - **Scalable Processing** - Redis Queue for handling large imports in the background
 - **Secure Authentication** - JWT-based auth with automatic token refresh
