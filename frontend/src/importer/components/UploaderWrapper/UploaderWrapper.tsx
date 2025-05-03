@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
-import { Button } from "@chakra-ui/button";
-import { Box, Text } from "@chakra-ui/react";
 import useThemeStore from "../../stores/theme";
 import { UploaderWrapperProps } from "./types";
-import { PiArrowCounterClockwise, PiFile } from "react-icons/pi";
+import { FileIcon, UploadIcon, Loader2 } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { cn } from "../../../utils/classes";
 
 export default function UploaderWrapper({ onSuccess, setDataError, ...props }: UploaderWrapperProps) {
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,6 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
     noClick: true,
     noKeyboard: true,
     maxFiles: 1,
-    // maxSize: 1 * Math.pow(1024, 3),
     accept: {
       "application/vnd.ms-excel": [".xls"],
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
@@ -24,7 +23,6 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
     },
     onDropRejected: (fileRejections) => {
       setLoading(false);
-      // const errorMessage = fileRejections.map((fileRejection) => fileRejection.errors[0].message).join(", ");
       const errorMessage = fileRejections[0].errors[0].message;
       setDataError(errorMessage);
     },
@@ -36,46 +34,46 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
   });
 
   return (
-    <Box padding="15px" border="1px solid var(--color-border)" borderRadius="var(--border-radius-2)">
-      <Box
+    <div className="p-4 border border-border rounded-md">
+      <div
         {...getRootProps()}
-        width="100%"
-        height="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        flex={1}
-        border="2px dashed var(--color-border)"
-        borderRadius="var(--border-radius-2)">
+        className={cn(
+          "w-full flex justify-center items-center flex-col p-6 border-2 border-dashed rounded-md transition-colors",
+          isDragActive ? "border-primary bg-primary/5" : "border-border",
+          "min-h-[140px]"
+        )}>
         <input {...getInputProps()} />
         {isDragActive ? (
-          <Text>{t("Drop your file here")}</Text>
+          <div className="text-center space-y-1">
+            <UploadIcon className="w-8 h-8 mx-auto text-primary animate-bounce" />
+            <p className="font-medium">{t("Drop your file here")}</p>
+          </div>
         ) : loading ? (
-          <Text>{t("Loading...")}</Text>
+          <div className="text-center space-y-1">
+            <Loader2 className="w-7 h-7 mx-auto text-primary animate-spin" />
+            <p>{t("Loading...")}</p>
+          </div>
         ) : (
-          <>
-            <Text>{t("Drop your file here")}</Text>
-            <Text>{t("or")}</Text>
-            <Button
-              leftIcon={<PiFile />}
-              onClick={open}
-              mt="6px"
-              colorScheme={"secondary"}
-              variant={theme === "light" ? "outline" : "solid"}
-              _hover={
-                theme === "light"
-                  ? {
-                      background: "var(--color-border)",
-                      color: "var(--color-text)",
-                    }
-                  : undefined
-              }>
-              {t("Browse files")}
-            </Button>
-          </>
+          <div className="text-center space-y-2">
+            <FileIcon className="w-8 h-8 mx-auto text-muted-foreground" />
+            <div>
+              <p className="font-medium">{t("Drop your file here")}</p>
+              <p className="text-xs text-muted-foreground">{t("Supports CSV, XLS, and XLSX files")}</p>
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 mt-1">
+              <span className="text-xs text-muted-foreground">{t("or")}</span>
+              <Button 
+                onClick={open}
+                variant={theme === "light" ? "outline" : "default"}
+                size="sm"
+                className="gap-1 mt-1">
+                <FileIcon className="w-3 h-3" />
+                {t("Browse files")}
+              </Button>
+            </div>
+          </div>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

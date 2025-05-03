@@ -31,6 +31,8 @@ interface ImportData {
   columns: Array<{ name: string }>;
   num_rows: number;
   num_columns: number;
+  success?: boolean; // Whether the import was successful
+  message?: string; // Message from the backend (success or error)
   backendResponse?: any; // Response from direct backend integration
   error?: string; // Error message if processing failed
 }
@@ -51,7 +53,13 @@ export default function ImporterPreviewPage() {
   const [loading, setLoading] = useState(true);
 
   const handleImportComplete = async (data: ImportData) => {
-    // Process import data
+    if (data.success) {
+      console.log(
+        `Successfully imported ${data.num_rows} rows with ${data.num_columns} columns`,
+      );
+    } else {
+      console.error(`Import failed: ${data.message || "Unknown error"}`);
+    }
   };
 
   // Fetch importer details to get the key

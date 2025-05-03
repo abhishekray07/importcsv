@@ -63,7 +63,7 @@ export default function Validation({
     });
     
     if (mismatches.length > 0) {
-      console.warn('Found mismatches between column mapping and template');
+
     }
   }, [template, columnMapping]);
 
@@ -91,7 +91,7 @@ export default function Validation({
         // Find the corresponding template field
         const field = template.columns.find(col => col.key === templateField);
         if (!field) {
-          console.warn(`No matching template field found for ${templateField}`);
+
           return;
         }
         

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Checkbox from "../../../components/Checkbox";
+import { Checkbox } from "../../../components/ui/checkbox";
 import { InputOption } from "../../../components/Input/types";
 import DropdownFields from "../components/DropDownFields";
 import { TemplateColumn, UploadColumn } from "../../../types";
 import stringsSimilarity from "../../../utils/stringSimilarity";
 import { TemplateColumnMapping } from "../types";
 import style from "../style/MapColumns.module.scss";
+import { cn } from "../../../../utils/classes";
 
 
 export default function useMapColumnsTable(
@@ -138,11 +139,19 @@ export default function useMapColumnsTable(
         [include]: {
           raw: false,
           content: (
-            <Checkbox
-              checked={suggestion.include}
-              disabled={!suggestion.key || isLoading}
-              onChange={(e) => handleUseChange(index, e.target.checked)}
-            />
+            <div className="flex justify-center">
+              <Checkbox
+                checked={suggestion.include}
+                disabled={!suggestion.key || isLoading}
+                onCheckedChange={(checked) => handleUseChange(index, checked === true)}
+                className={cn(
+                  "h-5 w-5 border-2 rounded-sm",
+                  "data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 data-[state=checked]:text-white",
+                  "border-gray-300 bg-white",
+                  "cursor-pointer"
+                )}
+              />
+            </div>
           ),
         },
       };

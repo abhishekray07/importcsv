@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import Input from "../../../components/Input";
 import { InputOption } from "../../../components/Input/types";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "../../../components/ui/select";
 
 type DropdownFieldsProps = {
   options: { [key: string]: InputOption };
@@ -11,7 +17,14 @@ type DropdownFieldsProps = {
   updateSelectedValues: (updatedValues: { key: string; selected: boolean | undefined }[]) => void;
 };
 
-export default function DropdownFields({ options, value, placeholder, onChange, selectedValues, updateSelectedValues }: DropdownFieldsProps) {
+export default function DropdownFields({ 
+  options, 
+  value, 
+  placeholder, 
+  onChange, 
+  selectedValues, 
+  updateSelectedValues 
+}: DropdownFieldsProps) {
   const [selectedOption, setSelectedOption] = useState(value);
   const [filteredOptions, setFilteredOptions] = useState<{ [key: string]: InputOption }>({});
 
@@ -23,8 +36,23 @@ export default function DropdownFields({ options, value, placeholder, onChange, 
     filterOptions();
   }, [options, selectedValues]);
 
-  const handleInputChange = (event: any) => {
-    const newValue = event;
+  const handleValueChange = (newValue: string) => {
+    // Handle special values
+    if (newValue === "__placeholder__" || newValue === "__empty__") {
+      // If placeholder or empty selection, treat it as an empty string 
+      const updatedSelectedValues = selectedValues.map((item) => {
+        if (item.key === selectedOption) {
+          return { ...item, selected: false };
+        }
+        return item;
+      });
+      
+      setSelectedOption("");
+      updateSelectedValues([...updatedSelectedValues]);
+      onChange("");
+      return;
+    }
+    
     const updatedSelectedValues = selectedValues.map((item) => {
       if (item.key === selectedOption) {
         return { ...item, selected: false };
@@ -33,6 +61,7 @@ export default function DropdownFields({ options, value, placeholder, onChange, 
       }
       return item;
     });
+    
     setSelectedOption(newValue);
     updateSelectedValues([...updatedSelectedValues]);
     onChange(newValue);
@@ -50,14 +79,27 @@ export default function DropdownFields({ options, value, placeholder, onChange, 
     setFilteredOptions(newFilteredOptions);
   };
 
+  const isEmpty = Object.keys(filteredOptions).length === 0;
+
   return (
-    <Input
-      options={filteredOptions}
-      value={selectedOption}
-      placeholder={placeholder}
-      variants={["small"]}
-      onChange={handleInputChange}
-      disabled={Object.keys(filteredOptions).length === 0}
-    />
+    <Select 
+      value={selectedOption} 
+      onValueChange={handleValueChange}
+      disabled={isEmpty}
+    >
+      <SelectTrigger className="h-8 text-sm bg-background border-input focus:ring-0 focus:ring-offset-0">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="__placeholder__">
+          {placeholder}
+        </SelectItem>
+        {Object.entries(filteredOptions).map(([key, option]) => (
+          <SelectItem key={String(option.value)} value={String(option.value || "__empty__")}>
+            {key}{option.required && <span className="text-destructive ml-1">*</span>}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

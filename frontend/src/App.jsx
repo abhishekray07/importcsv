@@ -45,7 +45,7 @@ function App() {
         setSelectedSchemaId(schemasData[0].id);
       }
     } catch (err) {
-      console.error('Failed to load data:', err);
+
       setError('Failed to load user data. Please log in again.');
       // Clear token if unauthorized
       if (err.message.includes('401')) {
@@ -63,7 +63,7 @@ function App() {
       const template = await schemaApi.getSchemaTemplate(token, selectedSchemaId);
       setSchemaTemplate(template);
     } catch (err) {
-      console.error('Failed to load schema template:', err);
+
       setError('Failed to load schema template.');
     } finally {
       setIsLoading(false);
@@ -79,7 +79,7 @@ function App() {
       setToken(data.access_token);
       localStorage.setItem('token', data.access_token);
     } catch (err) {
-      console.error('Login failed:', err);
+
       setError('Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
@@ -104,7 +104,7 @@ function App() {
       setImportJob(result);
       setIsImporterOpen(false);
     } catch (err) {
-      console.error('Import failed:', err);
+
       setError('Failed to process import. Please try again.');
     } finally {
       setIsLoading(false);
