@@ -1,7 +1,8 @@
 .content {
   display: flex;
   gap: var(--m);
-  height: 100%;
+  height: auto;
+  min-height: 200px;
 
   & > * {
     &:first-child {
@@ -18,12 +19,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--m-s);
+  max-height: 200px;
 }
 
 .tableContainer {
   overflow: hidden;
-  overflow-y: scroll;
-  height: 100%;
+  overflow-y: auto;
+  max-height: 150px;
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-2);
   > div {

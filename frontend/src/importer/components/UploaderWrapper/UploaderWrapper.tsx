@@ -36,16 +36,18 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
   });
 
   return (
-    <Box padding="15px" border="1px solid var(--color-border)" borderRadius="var(--border-radius-2)">
+    <Box padding="10px" border="1px solid var(--color-border)" borderRadius="var(--border-radius-2)">
       <Box
         {...getRootProps()}
         width="100%"
-        height="100%"
+        height="auto"
+        minHeight="120px"
         display="flex"
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
         flex={1}
+        py={3}
         border="2px dashed var(--color-border)"
         borderRadius="var(--border-radius-2)">
         <input {...getInputProps()} />
@@ -55,12 +57,12 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
           <Text>{t("Loading...")}</Text>
         ) : (
           <>
-            <Text>{t("Drop your file here")}</Text>
-            <Text>{t("or")}</Text>
+            <Text mb={1}>{t("Drop your file here")}</Text>
+            <Text fontSize="sm" mb={1}>{t("or")}</Text>
             <Button
               leftIcon={<PiFile />}
               onClick={open}
-              mt="6px"
+              size="sm"
               colorScheme={"secondary"}
               variant={theme === "light" ? "outline" : "solid"}
               _hover={
