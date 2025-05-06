@@ -4,6 +4,10 @@
   height: auto;
   min-height: 200px;
 
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+
   & > * {
     &:first-child {
       flex: 1 1 500px;
@@ -11,6 +15,10 @@
     }
     &:last-child {
       flex-basis: 38%;
+
+      @media (max-width: 480px) {
+        display: none; /* Hide the required columns table on mobile */
+      }
     }
   }
 }

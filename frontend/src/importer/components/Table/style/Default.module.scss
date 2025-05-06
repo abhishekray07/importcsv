@@ -13,6 +13,15 @@ $cellHeight: 44px;
   table-layout: fixed;
   overflow: hidden;
 
+  @media (max-width: 768px) {
+    font-size: 14px; /* Slightly smaller font on tablets */
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px; /* Even smaller font on mobile */
+    min-width: 320px; /* Ensure minimum width to prevent excessive squeezing */
+  }
+
   .thead {
     display: table-header-group;
   }
@@ -35,6 +44,12 @@ $cellHeight: 44px;
     align-items: center;
     height: $cellHeight;
     flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      height: 36px; /* Smaller cell height on mobile */
+      padding-left: var(--m-xxs) !important;
+      padding-right: var(--m-xxs) !important;
+    }
   }
 
   .caption {
@@ -86,6 +101,10 @@ $cellHeight: 44px;
 
         &.element {
           padding: 0 var(--m-s);
+
+          @media (max-width: 480px) {
+            padding: 0 var(--m-xxs);
+          }
         }
       }
 

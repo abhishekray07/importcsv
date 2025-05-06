@@ -10,10 +10,23 @@ body {
   background-color: #f5f5f5;
 }
 
+/* Add a viewport meta tag through CSS for older browsers */
+@-ms-viewport {
+  width: device-width;
+}
+
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 }
 
 .app-header {
@@ -23,17 +36,32 @@ body {
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid #e0e0e0;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 .app-header h1 {
   margin: 0;
   color: #333;
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 15px;
+
+  @media (max-width: 480px) {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 }
 
 .app-main {
@@ -41,6 +69,15 @@ body {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+    border-radius: 6px;
+  }
 }
 
 .schema-selector {
@@ -48,6 +85,12 @@ body {
   align-items: center;
   gap: 15px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 select {
@@ -55,6 +98,11 @@ select {
   border-radius: 4px;
   border: 1px solid #ccc;
   min-width: 200px;
+
+  @media (max-width: 480px) {
+    min-width: 100%;
+    width: 100%;
+  }
 }
 
 button {
@@ -65,6 +113,11 @@ button {
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
+
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 }
 
 button:hover {
@@ -88,6 +141,11 @@ button:disabled {
   padding: 10px 15px;
   border-radius: 4px;
   margin-bottom: 20px;
+
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 }
 
 .import-job-status {
@@ -95,6 +153,10 @@ button:disabled {
   padding: 15px;
   background-color: #e8f5e9;
   border-radius: 4px;
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 }
 
 .login-container {
@@ -104,6 +166,18 @@ button:disabled {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    max-width: 85%;
+    margin: 60px auto;
+    padding: 20px;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 95%;
+    margin: 30px auto;
+    padding: 15px;
+  }
 }
 
 .login-container h2 {
@@ -111,6 +185,11 @@ button:disabled {
   margin-bottom: 20px;
   text-align: center;
   color: #333;
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
 }
 
 .form-group {

@@ -6,6 +6,10 @@ $transition: all 0.3s ease-out;
   margin: var(--m-xs) auto;
   justify-content: center;
 
+  @media (max-width: 480px) {
+    display: none; /* Hide the stepper on mobile */
+  }
+
   .step {
     display: flex;
     gap: var(--m-xxs);

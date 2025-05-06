@@ -1,6 +1,6 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Button, Switch, Flex, Text, Tooltip, Icon } from "@chakra-ui/react";
+import { Button, Switch, Flex, Text, Tooltip, Icon, useMediaQuery } from "@chakra-ui/react";
 import { PiInfo } from "react-icons/pi";
 import Errors from "../../components/Errors";
 import Table from "../../components/Table";
@@ -26,6 +26,7 @@ export default function MapColumns({
   }
 
   const { t } = useTranslation();
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
   const headerRowIndex = selectedHeaderRow ? selectedHeaderRow : 0;
   let sampleDataRows = data.rows.slice(headerRowIndex + 1, headerRowIndex + 4);
 
@@ -79,13 +80,21 @@ export default function MapColumns({
     onSuccess(columns);
   };
 
+  // Adjust column widths based on screen size
+  const getColumnWidths = () => {
+    if (isMobile) {
+      return ["25%", "25%", "25%", "25%"];
+    }
+    return ["20%", "30%", "30%", "20%"];
+  };
+
   return (
     <div className={style.content}>
       {/* LLM matching removed for better UX */}
       <form onSubmit={onSubmit}>
         {data ? (
           <div className={style.tableWrapper}>
-            <Table data={rows} background="dark" fixHeader columnWidths={["20%", "30%", "30%", "20%"]} columnAlignments={["", "", "", "center"]} />
+            <Table data={rows} background="dark" fixHeader columnWidths={getColumnWidths()} columnAlignments={["", "", "", "center"]} />
           </div>
         ) : (
           <>{t("Loading...")}</>

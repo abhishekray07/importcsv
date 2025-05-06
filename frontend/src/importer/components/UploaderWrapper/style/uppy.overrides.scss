@@ -17,6 +17,10 @@
         width: auto !important;
         min-width: 200px;
         height: 100% !important;
+
+        @media (max-width: 768px) {
+          min-width: 150px;
+        }
       }
 
       &-AddFiles,
@@ -27,6 +31,16 @@
         color: inherit;
         font-size: var(--font-size-xxl);
         font-weight: 400;
+
+        @media (max-width: 768px) {
+          margin: var(--m-xs);
+          font-size: var(--font-size-xl);
+        }
+
+        @media (max-width: 480px) {
+          margin: var(--m-xxs);
+          font-size: var(--font-size-lg);
+        }
 
         &-title {
           color: inherit;
@@ -53,6 +67,11 @@
 
       &-Item {
         max-width: inherit;
+
+        @media (max-width: 480px) {
+          margin-bottom: var(--m-xxs);
+        }
+
         &-previewInnerWrap {
           background-color: var(--color-background) !important;
           border-radius: var(--border-radius-1);
@@ -63,6 +82,10 @@
         }
         &-status {
           color: inherit;
+
+          @media (max-width: 480px) {
+            font-size: 12px;
+          }
         }
         &-action {
           &--remove {
@@ -73,6 +96,11 @@
               width: var(--m);
               height: var(--m);
               aspect-ratio: 1;
+
+              @media (max-width: 480px) {
+                width: calc(var(--m) * 0.8);
+                height: calc(var(--m) * 0.8);
+              }
 
               stroke: none;
 
@@ -117,6 +145,15 @@
         display: flex;
         justify-content: space-between;
         width: auto;
+
+        @media (max-width: 768px) {
+          padding: var(--m-xs);
+          flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+          padding: var(--m-xxs);
+        }
 
         & > * {
           flex: 0 1 auto;
@@ -243,5 +280,30 @@
         }
       }
     }
+  }
+}
+
+// Add mobile-specific styles to make the importer more responsive on small screens
+@media (max-width: 480px) {
+  .uppy-Dashboard-Item-name {
+    font-size: 12px;
+  }
+
+  .uppy-Dashboard-Item-statusSize {
+    font-size: 10px;
+  }
+
+  .uppy-Dashboard-Item-preview {
+    width: 25px;
+    height: 25px;
+  }
+
+  .uppy-DashboardContent-addMore,
+  .uppy-DashboardContent-back {
+    font-size: 13px;
+  }
+
+  .uppy-StatusBar-content {
+    font-size: 12px;
   }
 }

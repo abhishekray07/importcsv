@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { Button } from "@chakra-ui/button";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useMediaQuery } from "@chakra-ui/react";
 import useThemeStore from "../../stores/theme";
 import { UploaderWrapperProps } from "./types";
 import { PiArrowCounterClockwise, PiFile } from "react-icons/pi";
@@ -11,6 +11,7 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
   const [loading, setLoading] = useState(false);
   const theme = useThemeStore((state) => state.theme);
   const { t } = useTranslation();
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     noClick: true,
@@ -36,33 +37,39 @@ export default function UploaderWrapper({ onSuccess, setDataError, ...props }: U
   });
 
   return (
-    <Box padding="10px" border="1px solid var(--color-border)" borderRadius="var(--border-radius-2)">
+    <Box
+      padding={isMobile ? "8px" : "10px"}
+      border="1px solid var(--color-border)"
+      borderRadius="var(--border-radius-2)"
+      width="100%"
+    >
       <Box
         {...getRootProps()}
         width="100%"
         height="auto"
-        minHeight="120px"
+        minHeight={isMobile ? "100px" : "120px"}
         display="flex"
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
         flex={1}
-        py={3}
+        py={isMobile ? 2 : 3}
+        px={isMobile ? 2 : 3}
         border="2px dashed var(--color-border)"
         borderRadius="var(--border-radius-2)">
         <input {...getInputProps()} />
         {isDragActive ? (
-          <Text>{t("Drop your file here")}</Text>
+          <Text fontSize={isMobile ? "sm" : "md"}>{t("Drop your file here")}</Text>
         ) : loading ? (
-          <Text>{t("Loading...")}</Text>
+          <Text fontSize={isMobile ? "sm" : "md"}>{t("Loading...")}</Text>
         ) : (
           <>
-            <Text mb={1}>{t("Drop your file here")}</Text>
-            <Text fontSize="sm" mb={1}>{t("or")}</Text>
+            <Text mb={1} fontSize={isMobile ? "sm" : "md"}>{t("Drop your file here")}</Text>
+            <Text fontSize={isMobile ? "xs" : "sm"} mb={1}>{t("or")}</Text>
             <Button
               leftIcon={<PiFile />}
               onClick={open}
-              size="sm"
+              size={isMobile ? "xs" : "sm"}
               colorScheme={"secondary"}
               variant={theme === "light" ? "outline" : "solid"}
               _hover={
