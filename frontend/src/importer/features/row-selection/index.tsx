@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../i18n/useTranslation";
 import { Alert } from "@chakra-ui/alert";
 import { Button } from "@chakra-ui/button";
 import Table from "../../components/Table";

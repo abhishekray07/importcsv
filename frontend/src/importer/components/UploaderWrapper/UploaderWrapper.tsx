@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../i18n/useTranslation";
 import { Button } from "@chakra-ui/button";
 import { Box, Text } from "@chakra-ui/react";
 import useThemeStore from "../../stores/theme";

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../i18n/useTranslation";
 import { Button } from "@chakra-ui/button";
 import Box from "../../components/Box";
 import { CompleteProps } from "./types";

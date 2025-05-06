@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../../i18n/useTranslation";
 import Checkbox from "../../../components/Checkbox";
 import { InputOption } from "../../../components/Input/types";
 import DropdownFields from "../components/DropDownFields";
@@ -18,7 +18,7 @@ export default function useMapColumnsTable(
   backendUrl?: string
 ) {
   const { t } = useTranslation();
-  
+
   useEffect(() => {
     Object.keys(columnsValues).map((uploadColumnIndexStr) => {
       const uploadColumnIndex = Number(uploadColumnIndexStr);
@@ -47,8 +47,8 @@ export default function useMapColumnsTable(
 
       if (matchedSuggestedTemplateColumn && matchedSuggestedTemplateColumn.key) {
         usedTemplateColumns.add(matchedSuggestedTemplateColumn.key);
-        acc[uc.index] = { 
-          key: matchedSuggestedTemplateColumn.key, 
+        acc[uc.index] = {
+          key: matchedSuggestedTemplateColumn.key,
           include: true,
           selected: true
         };
@@ -149,8 +149,8 @@ export default function useMapColumnsTable(
     });
   }, [values, isLoading]);
 
-  return { 
-    rows, 
+  return {
+    rows,
     formValues: values
   };
 }

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../../i18n/useTranslation";
 import Tooltip from "../../../components/Tooltip";
 import { TemplateColumn } from "../../../types";
 import { PiCheckBold } from "react-icons/pi";

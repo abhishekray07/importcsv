@@ -19,7 +19,7 @@ import RowSelection from "../row-selection";
 import Uploader from "../uploader";
 import Validation from '../validation/Validation';
 import { PiX } from "react-icons/pi";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../i18n/useTranslation";
 import config from "../../../config";
 
 export default function Main(props: CSVImporterProps) {

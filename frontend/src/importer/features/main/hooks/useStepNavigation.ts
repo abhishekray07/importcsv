@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../../i18n/useTranslation";
 import useStepper from "../../../components/Stepper/hooks/useStepper";
 import { Steps } from "../types";
 import useMutableLocalStorage from "./useMutableLocalStorage";
@@ -39,7 +39,7 @@ const getStepConfig = (skipHeader: boolean) => {
 };
 
 function useStepNavigation(initialStep: number, skipHeader: boolean) {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
   const translatedSteps = getStepConfig(skipHeader).map((step) => ({
     ...step,
     label: t(step.label),

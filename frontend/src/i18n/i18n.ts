@@ -1,35 +1,23 @@
-import i18, { Resource } from "i18next";
-import { initReactI18next } from "react-i18next";
-import esTranslation from "./es";
-import frTranslation from "./fr";
-import itTranslations from "./it";
-import deTranslations from "./de";
+// Removed i18next and react-i18next dependencies
+// Keeping a dummy i18n implementation to maintain compatibility
 
-const resources: Resource = {
-  en: {
-    translation: {},
+const dummyI18n = {
+  // Placeholder implementation
+  t: (key: string, options?: any) => {
+    // For keys with replacement patterns like '{{value}}'
+    if (options) {
+      let result = key;
+      Object.entries(options).forEach(([k, v]) => {
+        result = result.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+      });
+      return result;
+    }
+    return key;
   },
-  fr: {
-    translation: frTranslation,
-  },
-  es: {
-    translation: esTranslation,
-  },
-  it: {
-    translation: itTranslations,
-  },
-  de: {
-    translation: deTranslations,
-  },
+  // No-op change language function
+  changeLanguage: () => Promise.resolve(),
+  // No-op add resource bundle
+  addResourceBundle: () => true,
 };
 
-i18.use(initReactI18next).init({
-  resources,
-  lng: "en",
-  keySeparator: false,
-  interpolation: {
-    escapeValue: false,
-  },
-});
-
-export default i18;
+export default dummyI18n;

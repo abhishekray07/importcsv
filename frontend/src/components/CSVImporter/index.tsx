@@ -1,6 +1,4 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import "../../i18n/i18n";
 import Importer from "../../importer/features/main";
 import Providers from "../../importer/providers";
 import useThemeStore from "../../importer/stores/theme";
@@ -34,20 +32,7 @@ const CSVImporter = forwardRef((importerProps: CSVImporterProps, forwardRef?: an
   } = importerProps;
   const ref = forwardRef ?? useRef(null);
 
-  const { t, i18n } = useTranslation();
   const current = ref?.current as any;
-
-  useEffect(() => {
-    i18n.changeLanguage(language);
-  }, [language]);
-
-  useEffect(() => {
-    if (customTranslations) {
-      Object.keys(customTranslations).forEach((language) => {
-        i18n.addResourceBundle(language, "translation", customTranslations[language], true, true);
-      });
-    }
-  }, [customTranslations]);
 
   useEffect(() => {
     if (isModal && current) {

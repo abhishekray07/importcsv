@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../../i18n/useTranslation";
 import { Button, Switch, Flex, Text, Tooltip, Icon } from "@chakra-ui/react";
 import { PiInfo } from "react-icons/pi";
 import Errors from "../../components/Errors";
@@ -28,7 +28,7 @@ export default function MapColumns({
   const { t } = useTranslation();
   const headerRowIndex = selectedHeaderRow ? selectedHeaderRow : 0;
   let sampleDataRows = data.rows.slice(headerRowIndex + 1, headerRowIndex + 4);
-  
+
   // No longer using LLM suggestions
 
   const uploadColumns: UploadColumn[] = data.rows[headerRowIndex]?.values.map((cell, index) => {
@@ -40,9 +40,9 @@ export default function MapColumns({
     };
   });
   const { rows, formValues } = useMapColumnsTable(
-    uploadColumns, 
-    template.columns, 
-    columnMapping, 
+    uploadColumns,
+    template.columns,
+    columnMapping,
     isSubmitting,
     importerKey,
     backendUrl
