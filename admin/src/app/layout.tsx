@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ApiProvider } from "@/components/ApiProvider";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { LogRocketProvider } from "@/components/LogRocketProvider";
+import { HelpScoutWidget } from "@/components/HelpScoutWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
               <ApiProvider>
                 {children}
                 <Toaster />
+                <HelpScoutWidget />
               </ApiProvider>
             </LogRocketProvider>
           </PostHogProvider>
