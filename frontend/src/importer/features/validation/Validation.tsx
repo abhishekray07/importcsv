@@ -416,7 +416,7 @@ export default function Validation({
         <form onSubmit={handleSubmit}>
           <Flex justify="space-between" mt={4}>
             <Button onClick={onCancel} isDisabled={isSubmitting}>
-              {t('common.back', 'Back')}
+              Back
             </Button>
             <Button
               type="submit"
@@ -424,7 +424,7 @@ export default function Validation({
               isLoading={isSubmitting}
               isDisabled={disableOnInvalidRows && errors.length > 0}
             >
-              {t('common.continue', 'Continue')}
+              Submit
             </Button>
           </Flex>
         </form>

@@ -13,18 +13,8 @@ export const StepEnum = {
 };
 
 const calculateNextStep = (nextStep: number, skipHeader: boolean) => {
-  if (skipHeader) {
-    switch (nextStep) {
-      case StepEnum.Upload:
-      case StepEnum.RowSelection:
-        return StepEnum.MapColumns;
-      case StepEnum.MapColumns:
-        return StepEnum.Validation;
-      case StepEnum.Validation:
-        return StepEnum.Complete;
-      default:
-        return nextStep;
-    }
+  if (skipHeader && nextStep === StepEnum.RowSelection) {
+    return StepEnum.MapColumns;
   }
   return nextStep;
 };

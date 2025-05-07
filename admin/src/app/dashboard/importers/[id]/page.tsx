@@ -105,6 +105,21 @@ export default function ImporterDetailPage() {
     process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
   const importerId = params.id as string;
 
+  const [isCopied, setIsCopied] = React.useState(false);
+
+  const embedCode = `import { CSVImporter } from '@importcsv/react';\n\nexport default function YourComponent() {\n  return (\n    <CSVImporter\n      importerKey=\"${importer?.key ?? ""}\"\n      onComplete={(data) => {}}\n      user={{ userId: \"YOUR_USER_ID\" }}\n      metadata={{ source: \"YOUR_APP\" }}\n    />\n  );\n}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(embedCode);
+    setIsCopied(true);
+    toast({
+      title: "Copied!",
+      description: "Embed code copied to clipboard.",
+      variant: "default",
+    });
+    setTimeout(() => setIsCopied(false), 1500);
+  };
+
   // Fetch importer details
   useEffect(() => {
     const fetchImporterDetails = async () => {
@@ -630,38 +645,19 @@ export default function ImporterDetailPage() {
               <div className="space-y-4">
                 <div>
                   <Label>React Example</Label>
-                  <div className="bg-gray-900 text-gray-100 p-4 rounded-md mt-2 font-mono text-sm overflow-x-auto">
-                    {`import { CSVImporter } from 'csv-import-react';
-
-export default function YourComponent() {
-  return (
-    <CSVImporter
-      importerKey="${importer.key}"
-      onComplete={(data) => {}}
-      user={{ userId: "YOUR_USER_ID" }}
-      metadata={{ source: "YOUR_APP" }}
-    />
-  );
-}`}
-                  </div>
-                </div>
-
-                <div>
-                  <Label>HTML Example</Label>
-                  <div className="bg-gray-900 text-gray-100 p-4 rounded-md mt-2 font-mono text-sm overflow-x-auto">
-                    {`<script src="https://cdn.importcsv.com/v1/importer.js"></script>
-<div id="importer"></div>
-<script>
-  new CSVImporter({
-    containerId: 'importer',
-    importerKey: '${importer.key}',
-    onComplete: function(data) {
-
-    },
-    user: { userId: "YOUR_USER_ID" },
-    metadata: { source: "YOUR_APP" }
-  });
-</script>`}
+                  <div className="relative mt-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCopy}
+                      className="absolute top-2 right-2 z-10"
+                      aria-label="Copy embed code"
+                    >
+                      <Copy className={`h-4 w-4 ${isCopied ? "text-green-400" : ""}`} />
+                    </Button>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm overflow-x-auto whitespace-pre">
+                      <code>{embedCode}</code>
+                    </pre>
                   </div>
                 </div>
               </div>
@@ -671,7 +667,7 @@ export default function YourComponent() {
       </Tabs>
 
       {/* Save button at bottom right, within the container */}
-      <div className="flex justify-end pb-8">
+      <div className="flex justify-end pb-8 mt-4">
         <Button
           onClick={saveImporterSettings}
           disabled={isSaving}

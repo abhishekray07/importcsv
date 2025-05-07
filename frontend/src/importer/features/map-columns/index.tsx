@@ -110,7 +110,7 @@ export default function MapColumns({
             </div>
           )}
           <Button colorScheme="primary" isLoading={isSubmitting} type="submit">
-            {t("Submit")}
+            {t("Continue")}
           </Button>
         </div>
       </form>
