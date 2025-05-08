@@ -14,12 +14,22 @@
 [![Slack](https://img.shields.io/badge/Slack-Join%20Community-4A154B?logo=slack)](https://importcsv.slack.com)
 
 <p align="center">
-  <a href="#key-features">Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#documentation">Docs</a> •
   <a href="#demo">Demo</a> •
   <a href="#contributing">Contributing</a>
 </p>
+
+## Demo
+
+<div align="center">
+  <video width="800" controls>
+    <source src="docs/assets/demo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+## Features
 
 <div align="center">
   <img src="docs/assets/importer.png" alt="ImportCSV Demo" width="800">
@@ -30,8 +40,6 @@
 </div>
 
 </div>
-
-Quick Demo available [here](https://screen.studio/share/8STvmqkq).
 
 ## 🚀 Why ImportCSV?
 
@@ -162,7 +170,3 @@ We welcome contributions! Here's how to get started:
 ## 📝 License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## 🌟 Demo
-
-See ImportCSV in action at [importcsv.com](https://importcsv.com).
