@@ -22,9 +22,8 @@
 
 ## Demo
 
-<div align="center">
 https://github.com/user-attachments/assets/bca218fa-9fd1-4beb-abed-f3b1d745946a
-</div>
+
 
 ## Features
 
