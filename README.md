@@ -22,12 +22,8 @@
 
 ## Demo
 
-<div align="center">
-  <video width="800" controls>
-    <source src="docs/assets/demo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</div>
+https://github.com/user-attachments/assets/bca218fa-9fd1-4beb-abed-f3b1d745946a
+
 
 ## Features
 
