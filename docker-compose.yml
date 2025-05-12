@@ -82,7 +82,6 @@ services:
     volumes:
       - ./admin/src:/app/src
       - ./admin/public:/app/public
-      - ./frontend/build:/app/node_modules/csv-import-react/build
       - /app/node_modules
       - /app/.next
     restart: unless-stopped
