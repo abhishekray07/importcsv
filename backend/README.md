@@ -16,10 +16,9 @@ The ImportCSV backend is built with FastAPI and provides a robust API for proces
 ## ✨ Features
 
 - **🔄 Background Processing** - Redis Queue for handling large imports asynchronously
-- **🔒 Authentication** - FastAPI-Users with JWT tokens and refresh capability
+- **🔒 Authentication** - Clerk-based authentication with webhook sync
 - **📊 Data Validation** - Pydantic models for robust validation
-
-- **🔌 Extensible** - Webhook services
+- **🔌 Extensible** - Webhook services for real-time notifications
 
 ## 🏗️ Architecture
 
@@ -36,7 +35,7 @@ The backend follows a clean architecture with separation of concerns:
 
 - **ImportService** - Core service that handles all import business logic
 - **Queue Service** - Manages background job processing with Redis Queue
-- **Authentication** - JWT-based authentication with token refresh
+- **Authentication** - Clerk integration with JWT verification
 - **Database** - PostgreSQL with SQLAlchemy ORM
 
 ### Directory Structure
@@ -104,6 +103,30 @@ backend/
    python -m app.worker
    ```
 
+### Clerk Authentication Setup
+
+ImportCSV uses Clerk for authentication. You need to:
+
+1. **Create a Clerk account** at [clerk.com](https://clerk.com)
+
+2. **Configure Clerk webhook**:
+   - Go to Clerk Dashboard > Webhooks
+   - Add endpoint: `https://your-domain/api/v1/clerk/webhook`
+   - Select events: `user.created`, `user.updated`, `user.deleted`
+   - Copy the webhook secret
+
+3. **Get Clerk keys**:
+   - Go to Clerk Dashboard > API Keys
+   - Copy the JWT public key
+
+4. **Update your `.env` file**:
+   ```env
+   CLERK_WEBHOOK_SECRET=whsec_xxxxx  # From webhook configuration
+   CLERK_JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----
+   YOUR_PUBLIC_KEY_HERE
+   -----END PUBLIC KEY-----
+   ```
+
 ### Environment Variables
 
 Key environment variables:
@@ -117,12 +140,15 @@ REDIS_URL=redis://localhost:6379/0
 RQ_DEFAULT_TIMEOUT=360
 RQ_IMPORT_QUEUE=imports
 
-# Authentication
-SECRET_KEY=your-secret-key
-ACCESS_TOKEN_EXPIRE_MINUTES=120
-REFRESH_TOKEN_EXPIRE_MINUTES=10080
+# Security
+SECRET_KEY=your-secret-key-at-least-32-characters
 
+# Clerk Authentication (Required)
+CLERK_WEBHOOK_SECRET=whsec_xxxxx
+CLERK_JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----...
 
+# Webhook (for import callbacks)
+WEBHOOK_SECRET=your-webhook-secret
 ```
 
 ## 📄 License

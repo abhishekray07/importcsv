@@ -25,8 +25,6 @@ email_validator==2.2.0
 et_xmlfile==2.0.0
 executing==2.2.0
 fastapi==0.115.12
-fastapi-users==14.0.1
-fastapi-users-db-sqlalchemy==7.0.0
 filelock==3.18.0
 frozenlist==1.5.0
 fsspec==2025.3.2
@@ -57,7 +55,6 @@ openpyxl==3.1.5
 packaging==24.2
 pandas==2.2.3
 parso==0.8.4
-passlib==1.7.4
 pexpect==4.9.0
 pluggy==1.5.0
 prompt_toolkit==3.0.51
@@ -65,7 +62,6 @@ propcache==0.3.1
 psycopg2-binary==2.9.10
 ptyprocess==0.7.0
 pure_eval==0.2.3
-pwdlib==0.2.1
 pyasn1==0.4.8
 pycparser==2.22
 pydantic==2.11.3

@@ -1,7 +1,7 @@
 """Add key to importer
 
 Revision ID: c734150f184e
-Revises: add_token_blacklist
+Revises: 98f92bc3f715
 Create Date: 2025-04-26 13:51:24.378207
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = 'c734150f184e'
-down_revision: Union[str, None] = 'add_token_blacklist'
+down_revision: Union[str, None] = '98f92bc3f715'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
