@@ -1,18 +1,27 @@
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Button } from "@chakra-ui/button";
+import { Button, Box, Flex, Text, Link } from "@chakra-ui/react";
 import Table from "../../components/Table";
 import UploaderWrapper from "../../components/UploaderWrapper/UploaderWrapper";
-import useThemeStore from "../../stores/theme";
 import useTemplateTable from "./hooks/useTemplateTable";
 import { UploaderProps } from "./types";
 import style from "./style/Uploader.module.scss";
-import { PiDownloadSimple } from "react-icons/pi";
+import { PiDownloadSimple, PiInfo } from "react-icons/pi";
 
-
-export default function Uploader({ template, skipHeaderRowSelection, onSuccess, showDownloadTemplateButton, setDataError }: UploaderProps) {
+export default function Uploader({ 
+  template, 
+  skipHeaderRowSelection, 
+  onSuccess, 
+  showDownloadTemplateButton, 
+  setDataError 
+}: UploaderProps) {
   const fields = useTemplateTable(template.columns);
-  const theme = useThemeStore((state) => state.theme);
-  const uploaderWrapper = <UploaderWrapper onSuccess={onSuccess} skipHeaderRowSelection={skipHeaderRowSelection} setDataError={setDataError} />;
+  const uploaderWrapper = (
+    <UploaderWrapper 
+      onSuccess={onSuccess} 
+      skipHeaderRowSelection={skipHeaderRowSelection} 
+      setDataError={setDataError} 
+    />
+  );
   showDownloadTemplateButton = showDownloadTemplateButton ?? true;
   const { t } = useTranslation();
 
@@ -26,34 +35,75 @@ export default function Uploader({ template, skipHeaderRowSelection, onSuccess, 
     link.click();
   }
 
-  const downloadTemplateButton = showDownloadTemplateButton ? (
-    <Button
-      width="100%"
-      leftIcon={<PiDownloadSimple />}
-      onClick={downloadTemplate}
-      colorScheme={"secondary"}
-      variant={theme === "light" ? "outline" : "solid"}
-      _hover={
-        theme === "light"
-          ? {
-              background: "var(--color-border)",
-              color: "var(--color-text)",
-            }
-          : undefined
-      }>
-      {t("Download Template")}
-    </Button>
-  ) : null;
-
   return (
-    <div className={style.content}>
+    <div className={style.modernContent}>
+      {/* Title Section */}
+      <Box mb={6}>
+        <Text fontSize="2xl" fontWeight="600" color="#111827" mb={2}>
+          {t("Upload a CSV file")}
+        </Text>
+        <Text fontSize="md" color="#6B7280">
+          {t("Make sure file includes contact name and phone number")}
+        </Text>
+      </Box>
+
+      {/* Upload Area */}
       {uploaderWrapper}
-      <div className={style.box}>
-        <div className={style.tableContainer}>
-          <Table fixHeader data={fields} background="transparent" columnWidths={["65%", "35%"]} columnAlignments={["", "center"]} />
-        </div>
-        {downloadTemplateButton}
-      </div>
+
+      {/* Footer Links */}
+      <Flex mt={4} align="center" justify="space-between" flexWrap="wrap" gap={2}>
+        <Flex align="center" gap={4}>
+          <Link 
+            fontSize="sm" 
+            color="#6B7280"
+            textDecoration="underline"
+            _hover={{ color: "var(--color-primary)" }}
+          >
+            <Flex align="center" gap={1}>
+              <PiInfo size={16} />
+              {t("Learn more about importing contacts")}
+            </Flex>
+          </Link>
+          <Text fontSize="sm" color="#9CA3AF">or</Text>
+          {showDownloadTemplateButton && (
+            <Link
+              fontSize="sm"
+              color="var(--color-primary)"
+              textDecoration="underline"
+              onClick={downloadTemplate}
+              cursor="pointer"
+              _hover={{ color: "var(--color-primary-700)" }}
+            >
+              {t("download a sample CSV file")}
+            </Link>
+          )}
+        </Flex>
+      </Flex>
+
+      {/* Template Info Card (Hidden on mobile, shown if needed) */}
+      {fields.length > 0 && (
+        <Box 
+          mt={6}
+          p={4}
+          bg="white"
+          borderRadius="8px"
+          border="1px solid #E5E7EB"
+          display={{ base: "none", md: "block" }}
+        >
+          <Text fontSize="sm" fontWeight="600" color="#374151" mb={3}>
+            {t("Expected Columns")}
+          </Text>
+          <Box maxHeight="120px" overflow="auto">
+            <Table 
+              fixHeader 
+              data={fields} 
+              background="transparent" 
+              columnWidths={["65%", "35%"]} 
+              columnAlignments={["", "center"]} 
+            />
+          </Box>
+        </Box>
+      )}
     </div>
   );
 }

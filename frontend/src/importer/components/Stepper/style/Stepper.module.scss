@@ -1,13 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 $transition: all 0.3s ease-out;
 
 .stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  position: relative;
+  
+  @media (max-width: 640px) {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  @media (max-width: 480px) {
+    display: none; /* Hide the stepper on mobile */
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 200px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: $transition;
+
+  // Connecting line
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 30px);
+    width: calc(100% - 60px);
+    height: 2px;
+    background: #E5E7EB;
+    transition: $transition;
+    z-index: -1;
+  }
+
+  &.done:not(:last-child)::after {
+    background: var(--color-primary);
+  }
+
+  .badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #E5E7EB;
+    color: #6B7280;
+    font-weight: 600;
+    font-size: 14px;
+    transition: $transition;
+    position: relative;
+    z-index: 1;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .label {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #6B7280;
+    font-weight: 500;
+    transition: $transition;
+    text-align: center;
+    white-space: nowrap;
+    
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
+
+  &.active {
+    .badge {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(122, 94, 248, 0.1);
+    }
+    
+    .label {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+  }
+
+  &.done {
+    .badge {
+      background: var(--color-primary-100, #EDE9FE);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    
+    .label {
+      color: #111827;
+    }
+  }
+
+  &:hover:not(.active):not(.done) {
+    .badge {
+      border-color: var(--color-primary-300, #C4B5FD);
+      background: var(--color-primary-50, #F5F3FF);
+    }
+  }
+
+  &.stepWide {
+    .label {
+      @media (min-width: 768px) {
+        display: block;
+      }
+    }
+  }
+}
+
+// Legacy styles preserved for backward compatibility
+.stepper-legacy {
   display: flex;
   gap: var(--m);
   margin: var(--m-xs) auto;
   justify-content: center;
 
   @media (max-width: 480px) {
-    display: none; /* Hide the stepper on mobile */
+    display: none;
   }
 
   .step {

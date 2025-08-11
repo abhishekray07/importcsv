@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.modernContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  
+  @media (max-width: 480px) {
+    padding: 0 1rem;
+  }
+}
+
+// Legacy styles kept for backward compatibility
 .content {
   display: flex;
   gap: var(--m);
@@ -17,7 +33,7 @@
       flex-basis: 38%;
 
       @media (max-width: 480px) {
-        display: none; /* Hide the required columns table on mobile */
+        display: none;
       }
     }
   }

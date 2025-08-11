@@ -84,7 +84,7 @@ const CSVImporter = forwardRef((importerProps: CSVImporterProps, forwardRef?: an
 
   // Create a new component that properly passes only the props that Importer needs
   const ImporterComponent = () => (
-    <Providers>
+    <Providers primaryColor={primaryColor}>
       <Importer
         isModal={isModal}
         modalIsOpen={modalIsOpen}
