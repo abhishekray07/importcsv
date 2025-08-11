@@ -277,7 +277,7 @@ export default function ConfigureImport({
         </Box>
 
         {/* Action Buttons */}
-        <Flex gap={4}>
+        <Flex justify="space-between">
           <Button
             variant="outline"
             onClick={onCancel}

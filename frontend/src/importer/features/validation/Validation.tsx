@@ -442,7 +442,13 @@ export default function Validation({
 
         <form onSubmit={handleSubmit}>
           <Flex justify="space-between" mt={4}>
-            <Button onClick={onCancel} isDisabled={isSubmitting}>
+            <Button 
+              variant="outline"
+              onClick={onCancel} 
+              isDisabled={isSubmitting}
+              size="lg"
+              px={8}
+            >
               Back
             </Button>
             <Button
@@ -450,6 +456,8 @@ export default function Validation({
               colorScheme="blue"
               isLoading={isSubmitting}
               isDisabled={disableOnInvalidRows && errors.length > 0}
+              size="lg"
+              px={8}
             >
               Submit
             </Button>
