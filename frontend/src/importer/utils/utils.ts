@@ -10,9 +10,7 @@ export const parseObjectOrStringJSON = (name: string, param?: Record<string, unk
     try {
       parsedObj = JSON.parse(param);
     } catch (e) {
-      console.error(
-        `The '${name}' prop is not a valid JSON string. This prop can either be a JSON string or JSON object. Please check the documentation for more details.`
-      );
+      // Error parsing JSON
       return "";
     }
   } else {
@@ -40,9 +38,7 @@ export const parseObjectOrStringJSONToRecord = (name: string, param?: Record<str
     try {
       parsedObj = JSON.parse(param);
     } catch (e) {
-      console.error(
-        `The '${name}' prop is not a valid JSON string. This prop can either be a JSON string or JSON object. Please check the documentation for more details.`
-      );
+      // Error parsing JSON
       return {};
     }
   } else {
@@ -60,7 +56,7 @@ export const validateJSON = (str: string, paramName: string) => {
     const obj = JSON.parse(str);
     return JSON.stringify(obj);
   } catch (e) {
-    console.error(`The parameter '${paramName}' could not be parsed as JSON. Please check the documentation for more details.`, e);
+    // Error validating JSON
     return "";
   }
 };

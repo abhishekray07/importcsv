@@ -8,6 +8,8 @@ import { Template, UploadColumn } from "../../types";
 import useMapColumnsTable from "./hooks/useMapColumnsTable";
 import { MapColumnsProps, TemplateColumnMapping } from "./types";
 import style from "./style/MapColumns.module.scss";
+import { Button } from "../../components/ui/button";
+import { cn } from "../../../utils/classes";
 
 export default function MapColumns({
   template,
@@ -100,8 +102,14 @@ export default function MapColumns({
           <>{t("Loading...")}</>
         )}
 
-        <div className={style.actions}>
-          <Button type="button" colorScheme="secondary" onClick={onCancel} isDisabled={isSubmitting}>
+        <div className={cn(style.actions, "flex justify-between mt-4")}>
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={onCancel} 
+            disabled={isSubmitting}
+            className="px-6 font-medium"
+          >
             {skipHeaderRowSelection ? t("Cancel") : t("Back")}
           </Button>
           {!!error && (

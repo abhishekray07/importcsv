@@ -6,16 +6,17 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    gap: var(--m);
+    gap: 1rem;
 
     .tableWrapper {
       display: flex;
-      height: 100%;
+      max-height: 400px;
       overflow-y: auto;
       overflow-x: auto;
       padding: 1px;
-      margin-right: -20px;
-      padding-right: 21px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-background);
     }
 
     .actions {
@@ -35,7 +36,7 @@
 .samples {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1;
+  line-height: 1.2;
   white-space: nowrap;
 
   @media (max-width: 768px) {
@@ -45,9 +46,9 @@
   & > small {
     background-color: var(--color-input-background);
     font-family: monospace;
-    padding: var(--m-xxxxs);
-    border-radius: var(--border-radius-1);
-    font-size: var(--font-size-xs);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
     display: inline-block;
 
     @media (max-width: 480px) {
@@ -58,7 +59,7 @@
     }
 
     & + small {
-      margin-left: var(--m-xxxxs);
+      margin-left: 0.25rem;
     }
   }
 }

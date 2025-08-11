@@ -34,7 +34,7 @@
 .CSVImporter-dialog {
   border-radius: 1rem;
   width: 80vw;
-  height: 100vh;
+  max-height: 80vh;
   min-width: 907px;
   border: none;
   position: fixed;

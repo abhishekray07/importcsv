@@ -1,9 +1,11 @@
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as XLSX from "xlsx";
-import { IconButton, Button } from "@chakra-ui/react";
+import { Button, IconButton } from "@chakra-ui/react";
 import Errors from "../../components/Errors";
 import Stepper from "../../components/Stepper";
+import Validation from "../validation/Validation";
 import { CSVImporterProps } from "../../../types";
 import useCustomStyles from "../../hooks/useCustomStyles";
 import { Template } from "../../types";
@@ -18,7 +20,6 @@ import MapColumns from "../map-columns";
 import RowSelection from "../row-selection";
 import ConfigureImport from "../configure-import";
 import Uploader from "../uploader";
-import Validation from '../validation/Validation';
 import { PiX } from "react-icons/pi";
 import { useTranslation } from "../../../i18n/useTranslation";
 import config from "../../../config";
@@ -82,7 +83,7 @@ export default function Main(props: CSVImporterProps) {
     const fetchSchema = async () => {
       // ImporterKey is required
       if (!importerKey) {
-        setInitializationError('ImporterKey is required for CSV import. Please provide a valid importer key.');
+        setInitializationError("ImporterKey is required for CSV import. Please provide a valid importer key.");
         return;
       }
 
@@ -101,35 +102,31 @@ export default function Main(props: CSVImporterProps) {
         // Store the include_unmatched_columns setting from the importer configuration
         if (schemaData.include_unmatched_columns !== undefined) {
           setIncludeUnmatchedColumns(schemaData.include_unmatched_columns);
-          console.log('Include unmatched columns setting:', schemaData.include_unmatched_columns);
         }
 
         // Store the filter_invalid_rows setting from the importer configuration
         if (schemaData.filter_invalid_rows !== undefined) {
           setFilterInvalidRows(schemaData.filter_invalid_rows);
-          console.log('Filter invalid rows setting:', schemaData.filter_invalid_rows);
         }
 
         // Store the disable_on_invalid_rows setting from the importer configuration
         if (schemaData.disable_on_invalid_rows !== undefined) {
           setDisableOnInvalidRows(schemaData.disable_on_invalid_rows);
-          console.log('Disable on invalid rows setting:', schemaData.disable_on_invalid_rows);
         }
 
         // Convert the schema to the format expected by the importer
         const schemaTemplate = {
           columns: schemaData.fields.map((field: any) => {
-            console.log('Processing backend field:', field);
             return {
               name: field.name,
-              key: field.key || field.name.toLowerCase().replace(/\s+/g, '_'), // Convert to snake_case for keys if key is not provided
+              key: field.key || field.name.toLowerCase().replace(/\s+/g, "_"), // Convert to snake_case for keys if key is not provided
               required: field.required || false,
               description: field.description || `${field.name} field`,
               type: field.type, // Use the type directly from backend
               data_type: field.type, // Also store as data_type for compatibility
-              validation_format: field.validation_format
+              validation_format: field.validation_format,
             };
-          })
+          }),
         };
         console.log('Converted schema template:', schemaTemplate);
 
@@ -140,7 +137,6 @@ export default function Main(props: CSVImporterProps) {
           setParsedTemplate(parsedTemplate);
         }
       } catch (error) {
-        console.error('Error fetching schema:', error);
         setInitializationError(`Failed to fetch schema: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setIsLoadingSchema(false);
@@ -191,11 +187,11 @@ export default function Main(props: CSVImporterProps) {
 
     // Process rows to create data structure with mapped and unmapped data
     const headerRow = validatedData.rows[selectedHeaderRow || 0];
-    const mappedRows = validatedData.rows.slice(startIndex).map(row => {
+    const mappedRows = validatedData.rows.slice(startIndex).map((row) => {
       // Initialize the result structure
       const resultingRow: MappedRow = {
         data: {},
-        unmapped_data: {}
+        unmapped_data: {},
       };
 
       // Process each cell in the row
@@ -212,7 +208,7 @@ export default function Main(props: CSVImporterProps) {
           resultingRow.data[mapping.key] = normalizedValue;
         } else if (includeUnmatchedColumns && headerValue) {
           // Add to unmapped data if setting is enabled
-          const columnKey = headerValue.toString().toLowerCase().replace(/\s+/g, '_');
+          const columnKey = headerValue.toString().toLowerCase().replace(/\s+/g, "_");
           resultingRow.unmapped_data[columnKey] = normalizedValue;
         }
       });
@@ -232,20 +228,16 @@ export default function Main(props: CSVImporterProps) {
 
     // Check if importerKey is provided - it's required
     if (!importerKey) {
-      console.error('ERROR: importerKey is required for CSV import');
-      setDataError('ImporterKey is required for CSV import. Please provide a valid importer key.');
+      setDataError("ImporterKey is required for CSV import. Please provide a valid importer key.");
       setIsSubmitting(false);
       return;
     }
 
-
-
     // Transform data for the backend format
     const transformedData = {
       validData: mappedRows,
-      invalidData: [] // We don't track invalid rows in this version
+      invalidData: [], // We don't track invalid rows in this version
     };
-
 
     // Transform column mapping to a format expected by the backend
     const columnMappingForBackend: Record<string, string> = {};
@@ -254,7 +246,6 @@ export default function Main(props: CSVImporterProps) {
         columnMappingForBackend[index] = mapping.key;
       }
     });
-
 
     // Use the public endpoint for processing imports
     const apiEndpoint = `${backendUrl}/api/v1/imports/key/process`;
@@ -265,61 +256,58 @@ export default function Main(props: CSVImporterProps) {
       columnMapping: columnMappingForBackend,
       user: user || {},
       metadata: metadata || {},
-      importer_key: importerKey || ''
+      importer_key: importerKey || "",
     };
-
 
     // Send the data to the backend
 
     fetch(apiEndpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to process import: ${response.statusText}`);
         }
         return response.json();
       })
-      .then(result => {
-
+      .then((result) => {
         // Call onComplete with the simplified backend response
 
 
         // The backend now returns a simplified response with just success/failure status
         // and a job_id that can be used to track the job
         if (result.success) {
-          onComplete && onComplete({
-            success: true,
-            job_id: result.job_id,
-            message: result.message || 'Import job successfully enqueued',
-            num_rows: mappedRows.length,
-            num_columns: includedColumns.length
-          });
+          onComplete &&
+            onComplete({
+              success: true,
+              message: result.message || "Import job successfully enqueued",
+              num_rows: mappedRows.length,
+              num_columns: includedColumns.length,
+            });
         } else {
-          onComplete && onComplete({
-            success: false,
-            job_id: result.job_id,
-            message: result.message || 'Failed to process import',
-            num_rows: mappedRows.length,
-            num_columns: includedColumns.length
-          });
+          onComplete &&
+            onComplete({
+              success: false,
+              message: result.message || "Failed to process import",
+              num_rows: mappedRows.length,
+              num_columns: includedColumns.length,
+            });
         }
       })
-      .catch(error => {
-        console.error('Error processing import:', error);
-
+      .catch((error) => {
         // Call onComplete with the error
 
-        onComplete && onComplete({
-          success: false,
-          message: error.message,
-          num_rows: mappedRows.length,
-          num_columns: includedColumns.length
-        });
+        onComplete &&
+          onComplete({
+            success: false,
+            message: error.message || "Error processing import",
+            num_rows: mappedRows.length,
+            num_columns: includedColumns.length,
+          });
       });
 
     setIsSubmitting(false);
@@ -374,7 +362,7 @@ export default function Main(props: CSVImporterProps) {
                           errors: results.errors.map((error) => error.message),
                         });
                         goNext();
-                      }
+                      },
                     });
                     break;
                   case "xlsx":

@@ -172,7 +172,7 @@ export const authApi = {
     try {
       await apiClient.post('/auth/logout');
     } catch (error) {
-      console.error('Logout error:', error);
+
     } finally {
       // Always clear local storage
       localStorage.removeItem(AUTH_TOKEN_KEY);

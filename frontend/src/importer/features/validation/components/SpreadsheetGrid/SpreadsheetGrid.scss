@@ -1,0 +1,242 @@
+.spreadsheet-grid-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  .spreadsheet-toolbar {
+    padding: 0.75rem 1rem;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  .spreadsheet-table-wrapper {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    min-height: 0; // Important for flex child
+
+    table {
+      width: 100%;
+      border-collapse: collapse; // Changed from separate to collapse
+      border-spacing: 0;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
+    }
+
+    th {
+      background: #f7fafc;
+      border-bottom: 2px solid #cbd5e0;
+      border-right: 1px solid #e2e8f0;
+      font-weight: 600;
+      font-size: 0.8125rem;
+      color: #2d3748;
+      white-space: nowrap;
+      user-select: none;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      height: 32px;
+      
+      &:hover {
+        background: #edf2f7;
+      }
+      
+      &:first-child {
+        width: 50px;
+        text-align: center;
+      }
+    }
+
+    td {
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0;
+      height: 32px; // Reduced from 35px
+      position: relative;
+      vertical-align: middle;
+    }
+  }
+
+  .spreadsheet-cell {
+    width: 100%;
+    height: 32px; // Fixed height
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: text;
+    background: white;
+    transition: all 0.1s;
+    padding: 0 0.5rem;
+    border: 2px solid transparent;
+
+    &:hover {
+      background: #f0f7ff;
+      border-color: #90cdf4;
+    }
+    
+    .error-indicator {
+      position: relative;
+      
+      &:hover {
+        &::after {
+          content: attr(data-tooltip);
+          position: fixed;
+          background: #2d3748;
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          white-space: nowrap;
+          z-index: 99999;
+          pointer-events: none;
+          transform: translateX(-100%) translateY(-150%);
+        }
+      }
+    }
+  }
+  
+  // Special case for first few rows - show tooltip below
+  tbody tr:nth-child(-n+2) {
+    .spreadsheet-cell .error-indicator:hover {
+      &::after {
+        transform: translateX(-100%) translateY(150%);
+      }
+    }
+  }
+
+  .spreadsheet-cell {
+    &:focus {
+      outline: 2px solid #3182ce;
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    &.cell-selected {
+      background: #ebf8ff;
+      outline: 2px solid #3182ce;
+      outline-offset: -2px;
+      z-index: 2;
+    }
+
+    &.cell-in-selection {
+      background: #bee3f8;
+      opacity: 0.6;
+    }
+
+    &.cell-with-error {
+      background: #fff5f5;
+      
+      .error-indicator {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #e53e3e;
+        font-weight: bold;
+        font-size: 0.625rem;
+        background: white;
+        padding: 1px 4px;
+        border-radius: 2px;
+        border: 1px solid #fc8181;
+        cursor: help;
+        line-height: 1;
+      }
+    }
+
+    input {
+      width: 100%;
+      height: 28px;
+      border: none;
+      background: white;
+      font-size: 0.8125rem;
+      padding: 0 0.25rem;
+      
+      &:focus {
+        outline: none;
+        box-shadow: inset 0 0 0 2px #3182ce;
+      }
+    }
+  }
+
+  // Drag handle for fill
+  .drag-handle {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 6px;
+    height: 6px;
+    background: #3182ce;
+    border: 1px solid white;
+    cursor: crosshair;
+    z-index: 3;
+    
+    &:hover {
+      background: #2c5282;
+    }
+  }
+
+  // Context menu styles
+  .context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+    
+    .menu-item {
+      padding: 8px 12px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.1s;
+      
+      &:hover {
+        background: #f7fafc;
+      }
+      
+      &:not(:last-child) {
+        border-bottom: 1px solid #f7fafc;
+      }
+    }
+  }
+
+  // Virtual scrolling helpers
+  .virtual-spacer {
+    pointer-events: none;
+  }
+
+  // Loading state
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  // Selection overlay
+  .selection-overlay {
+    position: absolute;
+    border: 2px solid #3182ce;
+    background: rgba(49, 130, 206, 0.1);
+    pointer-events: none;
+    z-index: 5;
+  }
+}

@@ -41,6 +41,7 @@ services:
       - SECRET_KEY=your-secret-key-at-least-32-characters-long
       - WEBHOOK_SECRET=your-webhook-secret-for-callbacks
     volumes:
+      - ./backend:/app
       - ./backend/uploads:/app/uploads
       - backend_logs:/app/logs
     restart: unless-stopped
@@ -62,6 +63,7 @@ services:
       - SECRET_KEY=your-secret-key-at-least-32-characters-long
       - WEBHOOK_SECRET=your-webhook-secret-for-callbacks
     volumes:
+      - ./backend:/app
       - ./backend/uploads:/app/uploads
     restart: unless-stopped
     command: python -m app.worker
@@ -78,7 +80,10 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:8000
     volumes:
-      - ./frontend/build:/app/node_modules/csv-import-react/build
+      - ./admin/src:/app/src
+      - ./admin/public:/app/public
+      - /app/node_modules
+      - /app/.next
     restart: unless-stopped
 
 volumes:
