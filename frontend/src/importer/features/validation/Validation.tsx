@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, FormEvent } from 'react';
+import React, { useState, useMemo, FormEvent } from 'react';
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Button, Flex, Text, Box, Switch, Tooltip, Input, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import { Button, Flex, Text, Box, Switch, Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import { ValidationProps } from './types';
 import style from './style/Validation.module.scss';
 
@@ -21,39 +21,39 @@ export default function Validation({
   const { t } = useTranslation();
 
 
-  // Basic state setup
+  // State management
   const [editedValues, setEditedValues] = useState<Record<number, Record<number, any>>>({});
   const [errors, setErrors] = useState<Array<{rowIndex: number, columnIndex: number, message: string}>>([]);
   const [showOnlyErrors, setShowOnlyErrors] = useState(false);
 
-  // Extract header and data rows
+  // Data extraction
   const headerRowIndex = selectedHeaderRow || 0;
   const headerRow = fileData.rows[headerRowIndex];
   const dataRows = fileData.rows.slice(headerRowIndex + 1);
 
-  // Get included columns from mapping
+  // Column mapping
   const includedColumns = useMemo(() => {
     return Object.entries(columnMapping)
       .filter(([_, mapping]) => mapping.include)
       .map(([index]) => parseInt(index));
   }, [columnMapping]);
 
-  // Get column headers
+  // Headers
   const headers = useMemo(() => {
     return includedColumns.map(colIdx => String(headerRow.values[colIdx]));
   }, [includedColumns, headerRow]);
 
-  // Validate data - use a ref to track if we need to validate
+  // Validation tracking
   const shouldValidateRef = React.useRef(true);
 
-  // Create a stable version of editedValues for dependency tracking
+  // Stable reference for edited values
   const editedValuesRef = React.useRef(editedValues);
   React.useEffect(() => {
     editedValuesRef.current = editedValues;
     shouldValidateRef.current = true;
   }, [editedValues]);
 
-  // Check for mapping mismatches
+  // Validate column mappings
   React.useEffect(() => {
     // Check if mappings match template fields
     const templateKeys = template.columns.map(col => col.key);
@@ -67,7 +67,7 @@ export default function Validation({
     }
   }, [template, columnMapping]);
 
-  // Separate validation logic
+  // Data validation
   const validateData = React.useCallback(() => {
     if (!shouldValidateRef.current) return;
 
@@ -230,12 +230,12 @@ export default function Validation({
     shouldValidateRef.current = false;
   }, [dataRows, columnMapping, template, headerRowIndex]);
 
-  // Run validation when needed
+  // Trigger validation
   React.useEffect(() => {
     validateData();
   }, [validateData]);
 
-  // Handle cell edit with debouncing to prevent too many updates
+  // Cell editing
   const handleCellEdit = React.useCallback((rowIdx: number, colIdx: number, value: string) => {
     setEditedValues(prev => {
       // Only update if value actually changed
@@ -252,7 +252,7 @@ export default function Validation({
     });
   }, []);
 
-  // Filter rows if showing only errors
+  // Row filtering
   const visibleRows = useMemo(() => {
     if (!showOnlyErrors) return dataRows;
 
@@ -262,7 +262,7 @@ export default function Validation({
     });
   }, [dataRows, showOnlyErrors, errors, headerRowIndex]);
 
-  // Track rows with errors - consolidated error tracking
+  // Error tracking
   const errorTracking = useMemo(() => {
     const indices = new Set<number>();
     const rowObjects = new Set<number>();
@@ -283,7 +283,7 @@ export default function Validation({
     };
   }, [errors, headerRowIndex, dataRows]);
 
-  // Handle form submission
+  // Form submission
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -317,7 +317,6 @@ export default function Validation({
     });
   };
 
-  // Render the component
   return (
     <div className={style.validationContainer}>
       <div className={style.header}>
@@ -326,15 +325,6 @@ export default function Validation({
       </div>
 
       <div className={style.validationContent}>
-        {errors.length > 0 && (
-          <div className={style.errorSummary}>
-            <Flex justify="space-between" align="center">
-              <Text color="red.500">
-                {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
-              </Text>
-            </Flex>
-          </div>
-        )}
 
         {filterInvalidRows && errorTracking.count > 0 && (
           <Alert status="warning" variant="left-accent" mt={4} mb={4}>
@@ -350,67 +340,104 @@ export default function Validation({
           </Alert>
         )}
 
-        <div className={style.validationFilters}>
-          <Flex align="center">
-            <Switch
-              id="show-errors-only"
-              isChecked={showOnlyErrors}
-              onChange={(e) => setShowOnlyErrors(e.target.checked)}
-              mr={2}
-            />
-            <Text fontSize="sm">Show only rows with errors</Text>
+        <div className={style.toolbar}>
+          <Flex justify="space-between" align="center">
+            <Flex align="center" gap={4}>
+              <Flex align="center">
+                <Switch
+                  id="show-errors-only"
+                  size="sm"
+                  isChecked={showOnlyErrors}
+                  onChange={(e) => setShowOnlyErrors(e.target.checked)}
+                  mr={2}
+                />
+                <Text fontSize="sm" fontWeight="medium">Show only rows with errors</Text>
+              </Flex>
+              {errors.length > 0 && (
+                <Text fontSize="sm" color="red.500" fontWeight="medium">
+                  {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
+                </Text>
+              )}
+            </Flex>
+            <Flex gap={2}>
+              <Text fontSize="xs" color="gray.500">
+                {visibleRows.length} of {dataRows.length} rows
+              </Text>
+            </Flex>
           </Flex>
         </div>
 
-        <div className={style.tableContainer}>
-          <table className={style.validationTable}>
-            <thead>
-              <tr>
-                {headers.map((header, idx) => (
-                  <th key={idx}>{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {visibleRows.map((row, rowIdx) => {
-                const actualRowIdx = dataRows.indexOf(row);
-                const displayRowIndex = actualRowIdx + headerRowIndex + 1;
-                const rowHasError = errors.some(err => err.rowIndex === displayRowIndex);
+        <div className={style.spreadsheetContainer}>
+          <div className={style.spreadsheetWrapper}>
+            <table className={style.spreadsheetTable}>
+              <thead className={style.spreadsheetHeader}>
+                <tr>
+                  <th className={style.rowNumberHeader}>#</th>
+                  {headers.map((header, idx) => (
+                    <th key={idx} className={style.columnHeader}>
+                      <div className={style.headerContent}>{header}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className={style.spreadsheetBody}>
+                {visibleRows.map((row, rowIdx) => {
+                  const actualRowIdx = dataRows.indexOf(row);
+                  const displayRowIndex = actualRowIdx + headerRowIndex + 1;
+                  const rowHasError = errors.some(err => err.rowIndex === displayRowIndex);
 
-                return (
-                  <tr key={rowIdx} className={rowHasError ? style.errorRow : ''}>
-                    {includedColumns.map((colIdx, idx) => {
-                      const originalValue = row.values[colIdx];
-                      const editedValue = editedValues[actualRowIdx]?.[colIdx];
-                      const value = editedValue !== undefined ? editedValue : originalValue;
+                  return (
+                    <tr key={rowIdx} className={`${style.dataRow} ${rowHasError ? style.errorRow : ''}`}>
+                      <td className={style.rowNumber}>
+                        <span>{displayRowIndex + 1}</span>
+                      </td>
+                      {includedColumns.map((colIdx, idx) => {
+                        const originalValue = row.values[colIdx];
+                        const editedValue = editedValues[actualRowIdx]?.[colIdx];
+                        const value = editedValue !== undefined ? editedValue : originalValue;
 
-                      const error = errors.find(
-                        err => err.rowIndex === displayRowIndex && err.columnIndex === colIdx
-                      );
+                        const error = errors.find(
+                          err => err.rowIndex === displayRowIndex && err.columnIndex === colIdx
+                        );
 
-                      return (
-                        <td key={idx}>
-                          <div className={style.editableCellContainer}>
-                            <Input
-                              size="sm"
-                              value={String(value || '')}
-                              onChange={(e) => handleCellEdit(actualRowIdx, colIdx, e.target.value)}
-                              className={`${style.simpleInput} ${error ? style.errorInput : ''}`}
-                            />
-                            {error && (
-                              <Tooltip label={error.message} placement="top">
-                                <Box className={style.errorIcon}>!</Box>
-                              </Tooltip>
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                        return (
+                          <td key={idx} className={`${style.dataCell} ${error ? style.errorCell : ''}`}>
+                            <div className={style.cellContent}>
+                              <input
+                                type="text"
+                                value={String(value || '')}
+                                onChange={(e) => handleCellEdit(actualRowIdx, colIdx, e.target.value)}
+                                className={style.cellInput}
+                                tabIndex={0}
+                              />
+                              {error && (
+                                <Tooltip label={error.message} placement="top" hasArrow>
+                                  <span className={style.errorIndicator}>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                      <circle cx="8" cy="8" r="7" fill="#DC2626"/>
+                                      <path d="M8 4.5V9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                                      <circle cx="8" cy="11.5" r="0.75" fill="white"/>
+                                    </svg>
+                                  </span>
+                                </Tooltip>
+                              )}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {visibleRows.length === 0 && (
+              <div className={style.emptyState}>
+                <Text color="gray.500">
+                  {showOnlyErrors ? 'No rows with errors found' : 'No data to display'}
+                </Text>
+              </div>
+            )}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>

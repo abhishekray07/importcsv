@@ -1,0 +1,317 @@
+// Modern Spreadsheet Grid Styles
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// Variables
+$border-color: #e5e7eb;
+$header-bg: #f9fafb;
+$hover-bg: #f3f4f6;
+$error-bg: #fee2e2;
+$error-hover-bg: #fecaca;
+$error-color: #dc2626;
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$row-number-bg: #f9fafb;
+$focus-color: #3b82f6;
+$focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+
+.simple-spreadsheet-grid-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.spreadsheet-toolbar {
+  padding: 1rem;
+  background: white;
+  border-bottom: 1px solid $border-color;
+}
+
+.spreadsheet-table-wrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: white;
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+  
+  &::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+  }
+  
+  // Chakra UI Table overrides
+  .chakra-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    min-width: 100%;
+    
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: $header-bg;
+      
+      tr {
+        th {
+          background: $header-bg !important;
+          border-bottom: 2px solid $border-color !important;
+          border-right: 1px solid $border-color !important;
+          padding: 0.75rem 1rem !important;
+          text-align: left;
+          font-weight: 600 !important;
+          font-size: 0.875rem !important;
+          color: $text-primary !important;
+          text-transform: none !important;
+          letter-spacing: normal !important;
+          white-space: nowrap;
+          position: relative;
+          
+          &:first-child {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            text-align: center !important;
+            position: sticky;
+            left: 0;
+            z-index: 11;
+            background: $row-number-bg !important;
+            font-size: 0.75rem !important;
+          }
+          
+          &:last-child {
+            border-right: none !important;
+          }
+        }
+      }
+    }
+    
+    tbody {
+      tr {
+        transition: background-color 0.15s ease;
+        
+        &:hover {
+          td {
+            background: $hover-bg !important;
+            
+            &:first-child {
+              background: darken($row-number-bg, 3%) !important;
+            }
+          }
+          
+          .cell-with-error {
+            background: $error-hover-bg !important;
+          }
+        }
+        
+        td {
+          border-right: 1px solid $border-color !important;
+          border-bottom: 1px solid $border-color !important;
+          padding: 0 !important;
+          height: 36px;
+          background: white;
+          position: relative;
+          
+          &:first-child {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            background: $row-number-bg !important;
+            text-align: center !important;
+            padding: 0.5rem 0 !important;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            font-size: 0.75rem !important;
+            font-weight: 500 !important;
+            color: $text-secondary !important;
+          }
+          
+          &:last-child {
+            border-right: none !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Cell styles
+.cell-with-error {
+  background: $error-bg !important;
+  position: relative;
+  
+  &:hover {
+    background: $error-hover-bg !important;
+  }
+}
+
+// Editable cell styles
+.chakra-flex {
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  
+  // Cell content wrapper
+  &[cursor="pointer"] {
+    cursor: text !important;
+    padding: 0.5rem 0.75rem !important;
+    min-height: 36px;
+    transition: background-color 0.15s ease;
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    
+    .chakra-text {
+      font-size: 0.875rem !important;
+      line-height: 1.25rem !important;
+      color: $text-primary !important;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+// Input field styles
+.chakra-input {
+  border: none !important;
+  background: transparent !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  color: $text-primary !important;
+  outline: none !important;
+  box-shadow: none !important;
+  height: 36px !important;
+  line-height: 1.25rem !important;
+  
+  &:focus {
+    box-shadow: inset 0 0 0 2px $focus-color !important;
+    background: white !important;
+    z-index: 2;
+    position: relative;
+  }
+}
+
+// Error indicator
+.error-indicator {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: $error-color;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  pointer-events: all;
+}
+
+// Empty state
+.chakra-box {
+  &[p="8"] {
+    padding: 3rem !important;
+    text-align: center;
+    
+    .chakra-text {
+      color: $text-secondary !important;
+      font-size: 0.875rem !important;
+    }
+  }
+}
+
+// Alert styles
+.chakra-alert {
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  
+  .chakra-alert__title {
+    font-weight: 600 !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .chakra-alert__desc {
+    font-size: 0.875rem !important;
+  }
+}
+
+// Button styles
+.chakra-button {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease !important;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// Switch styles
+.chakra-switch {
+  &__track {
+    background: #e5e7eb !important;
+    
+    &[data-checked] {
+      background: $focus-color !important;
+    }
+  }
+}
+
+// Typography adjustments
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+// Row highlight on error filter
+.spreadsheet-table-wrapper {
+  &[data-show-errors="true"] {
+    .chakra-table tbody tr {
+      animation: fadeIn 0.3s ease;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
