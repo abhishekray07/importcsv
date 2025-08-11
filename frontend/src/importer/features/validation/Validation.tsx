@@ -1,5 +1,4 @@
 import React, { useState, useMemo, FormEvent } from 'react';
-import { useTranslation } from "../../../i18n/useTranslation";
 import { Button, Flex, Text, Box, Switch, Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import { ValidationProps } from './types';
 import style from './style/Validation.module.scss';
@@ -18,9 +17,6 @@ export default function Validation({
   filterInvalidRows,
   disableOnInvalidRows,
 }: ValidationProps) {
-  const { t } = useTranslation();
-
-
   // State management
   const [editedValues, setEditedValues] = useState<Record<number, Record<number, any>>>({});
   const [errors, setErrors] = useState<Array<{rowIndex: number, columnIndex: number, message: string}>>([]);
@@ -320,8 +316,8 @@ export default function Validation({
   return (
     <div className={style.validationContainer}>
       <div className={style.header}>
-        <h2>{t('validation.title', 'Validate Data')}</h2>
-        <p>{t('validation.description', 'Review and correct any errors in your data before importing.')}</p>
+        <h2>Validate Data</h2>
+        <p>Review and correct any errors in your data before importing.</p>
       </div>
 
       <div className={style.validationContent}>
@@ -330,11 +326,9 @@ export default function Validation({
           <Alert status="warning" variant="left-accent" mt={4} mb={4}>
             <AlertIcon />
             <Box>
-              <AlertTitle>{t('validation.invalidRowsWarning', 'Invalid Rows Will Be Filtered')}</AlertTitle>
+              <AlertTitle>Invalid Rows Will Be Filtered</AlertTitle>
               <AlertDescription>
-                {t('validation.invalidRowsDescription',
-                  `${errorTracking.count} ${errorTracking.count === 1 ? 'row' : 'rows'} with validation errors will be excluded from the import. You can fix the errors to include these rows.`
-                )}
+                {`${errorTracking.count} ${errorTracking.count === 1 ? 'row' : 'rows'} with validation errors will be excluded from the import. You can fix the errors to include these rows.`}
               </AlertDescription>
             </Box>
           </Alert>
