@@ -19,6 +19,8 @@ $focus-color: #3b82f6;
   flex-direction: column;
   height: 100%;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
@@ -46,6 +48,7 @@ $focus-color: #3b82f6;
   flex-direction: column;
   padding: 1.5rem;
   overflow: hidden;
+  min-width: 0;
 }
 
 // Toolbar
@@ -66,21 +69,23 @@ $focus-color: #3b82f6;
   border: 1px solid $border-color;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  min-width: 0;
 }
 
 .spreadsheetWrapper {
   height: 100%;
+  width: 100%;
   overflow: auto;
   position: relative;
 }
 
 // Spreadsheet Table
 .spreadsheetTable {
-  width: 100%;
+  width: auto;
+  min-width: fit-content;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
-  min-width: 100%;
 }
 
 // Header
@@ -109,9 +114,9 @@ $focus-color: #3b82f6;
 }
 
 .rowNumberHeader {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
   text-align: center !important;
   background: $row-number-bg !important;
   position: sticky;
@@ -122,9 +127,13 @@ $focus-color: #3b82f6;
 }
 
 .columnHeader {
+  width: auto;
+  min-width: 100px;
+  
   .headerContent {
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -153,9 +162,9 @@ $focus-color: #3b82f6;
 }
 
 .rowNumber {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
   background: $row-number-bg;
   border-right: 1px solid $border-color;
   border-bottom: 1px solid $border-color;
@@ -163,19 +172,22 @@ $focus-color: #3b82f6;
   font-size: 0.75rem;
   font-weight: 500;
   color: $text-secondary;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   position: sticky;
   left: 0;
   z-index: 1;
 }
 
 .dataCell {
+  width: auto;
+  min-width: 100px;
   border-right: 1px solid $border-color;
   border-bottom: 1px solid $border-color;
   padding: 0;
   background: white;
   position: relative;
   transition: background-color 0.15s ease;
+  white-space: nowrap;
   
   &:last-child {
     border-right: none;
@@ -193,7 +205,7 @@ $focus-color: #3b82f6;
 .cellContent {
   position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
 }
@@ -201,15 +213,19 @@ $focus-color: #3b82f6;
 .cellInput {
   width: 100%;
   height: 100%;
+  min-height: 40px;
   border: none;
   background: transparent;
-  padding: 0.5rem 0.75rem;
-  padding-right: 2rem;
+  padding: 0.625rem 0.75rem;
+  padding-right: 1.75rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: $text-primary;
   outline: none;
   transition: box-shadow 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   
   &:focus {
     box-shadow: inset 0 0 0 2px $focus-color;
