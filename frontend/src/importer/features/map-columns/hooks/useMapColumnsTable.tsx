@@ -7,7 +7,6 @@ import { TemplateColumn, UploadColumn } from "../../../types";
 import stringsSimilarity from "../../../utils/stringSimilarity";
 import { TemplateColumnMapping } from "../types";
 import style from "../style/MapColumns.module.scss";
-import { cn } from "../../../../utils/classes";
 
 
 export default function useMapColumnsTable(
@@ -143,13 +142,7 @@ export default function useMapColumnsTable(
               <Checkbox
                 checked={suggestion.include}
                 disabled={!suggestion.key || isLoading}
-                onCheckedChange={(checked) => handleUseChange(index, checked === true)}
-                className={cn(
-                  "h-5 w-5 border-2 rounded-sm",
-                  "data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 data-[state=checked]:text-white",
-                  "border-gray-300 bg-white",
-                  "cursor-pointer"
-                )}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUseChange(index, e.target.checked)}
               />
             </div>
           ),

@@ -225,7 +225,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
   const [showFindReplace, setShowFindReplace] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
-  
+
   const undoRedoManager = useRef(new UndoRedoManager());
   const clipboardManager = useRef(new ClipboardManager());
   const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -268,18 +268,18 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
         _rowIndex: actualRowIndex,
         _rowNumber: actualRowIndex + headerRowIndex + 2,
       };
-      
+
       includedColumns.forEach(colIdx => {
         rowData[`col_${colIdx}`] = row.values?.[colIdx] || '';
       });
-      
+
       return rowData;
     });
   }, [visibleRows, data, includedColumns, headerRowIndex]);
 
   const handleCellEdit = useCallback((rowIdx: number, colIdx: number, value: string) => {
     const oldValue = data[rowIdx]?.values?.[colIdx] || '';
-    
+
     undoRedoManager.current.addAction({
       type: 'edit',
       data: { rowIdx, colIdx, oldValue, newValue: value }
@@ -337,7 +337,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
   const handleCopy = useCallback(() => {
     if (selection) {
       const cells = getCellsInSelection(selection);
-      const values = cells.map(cell => 
+      const values = cells.map(cell =>
         data[cell.row]?.values?.[cell.col] || ''
       );
       clipboardManager.current.copy(values, selection);
@@ -369,7 +369,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
       row.forEach((value, colOffset) => {
         const targetRow = selectedCell.row + rowOffset;
         const targetCol = selectedCell.col + colOffset;
-        
+
         if (targetRow < data.length && includedColumns.includes(targetCol)) {
           edits.push({ rowIdx: targetRow, colIdx: targetCol, value });
         }
@@ -524,7 +524,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
 
     includedColumns.forEach((colIdx) => {
       const header = String(headerRow.values[colIdx]);
-      
+
       cols.push({
         id: `col_${colIdx}`,
         header,
@@ -535,7 +535,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
           const errorKey = `${csvRowNumber}-${colIdx}`;
           const error = errorMap[errorKey];
           const cellKey = `${rowIdx}-${colIdx}`;
-          
+
           return (
             <EditableCell
               getValue={getValue}
@@ -624,7 +624,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
         </Alert>
       )}
 
-      <div 
+      <div
         ref={parentRef}
         className="spreadsheet-table-wrapper"
       >
@@ -657,7 +657,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
             ))}
           </Tbody>
         </Table>
-        
+
         {tableData.length === 0 && (
           <Box p={8} textAlign="center">
             <Text>No data to display.</Text>

@@ -436,9 +436,9 @@ export default function Validation({
 
         <form onSubmit={handleSubmit}>
           <Flex justify="space-between" mt={4}>
-            <Button 
+            <Button
               variant="outline"
-              onClick={onCancel} 
+              onClick={onCancel}
               isDisabled={isSubmitting}
               size="lg"
               px={8}

@@ -1,6 +1,5 @@
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import * as XLSX from "xlsx";
 import { Button, IconButton } from "@chakra-ui/react";
 import Errors from "../../components/Errors";

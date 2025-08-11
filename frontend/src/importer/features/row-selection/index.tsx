@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { Alert } from "@chakra-ui/alert";
+import { Button } from "@chakra-ui/react";
 import Table from "../../components/Table";
 import Tooltip from "../../components/Tooltip";
 import { RowSelectionProps } from "./types";
 import style from "./style/RowSelection.module.scss";
 import { PiWarningCircle } from "react-icons/pi";
-import { Button } from "../../components/ui/button";
-import { cn } from "../../../utils/classes";
 
 export default function RowSelection({ data, onSuccess, onCancel, selectedHeaderRow, setSelectedHeaderRow }: RowSelectionProps) {
   const { t } = useTranslation();
@@ -95,22 +94,20 @@ export default function RowSelection({ data, onSuccess, onCancel, selectedHeader
           <>{t("Loading...")}</>
         )}
 
-        <div className={cn(style.actions, "flex justify-between mt-4")}>
+        <div className={style.actions}>
           <Button 
             type="button" 
             variant="outline" 
             onClick={onCancel} 
-            disabled={isLoading}
-            className="px-6 font-medium"
+            isDisabled={isLoading}
           >
             {t("Back")}
           </Button>
           <Button 
             type="submit"
-            variant="default"
+            colorScheme="primary"
             onClick={handleNextClick} 
             isLoading={isLoading}
-            className="px-6 font-medium"
           >
             {t("Continue")}
           </Button>
