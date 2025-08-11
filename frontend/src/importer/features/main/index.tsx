@@ -16,6 +16,7 @@ import style from "./style/Main.module.scss";
 import Complete from "../complete";
 import MapColumns from "../map-columns";
 import RowSelection from "../row-selection";
+import ConfigureImport from "../configure-import";
 import Uploader from "../uploader";
 import Validation from '../validation/Validation';
 import { PiX } from "react-icons/pi";
@@ -42,8 +43,9 @@ export default function Main(props: CSVImporterProps) {
   // Apply custom styles
   useCustomStyles(parseObjectOrStringJSON("customStyles", customStyles));
 
-  // Stepper handler
-  const { currentStep, setStep, goNext, goBack, stepper, setStorageStep } = useStepNavigation(StepEnum.Upload, skipHeader);
+  // Stepper handler - using consolidated flow
+  const useConsolidatedFlow = true; // Feature flag for new consolidated flow
+  const { currentStep, setStep, goNext, goBack, stepper, setStorageStep } = useStepNavigation(StepEnum.Upload, skipHeader, useConsolidatedFlow);
 
   // Error handling
   const [initializationError, setInitializationError] = useState<string | null>(null);
@@ -405,6 +407,11 @@ export default function Main(props: CSVImporterProps) {
           />
         );
       case StepEnum.RowSelection:
+        // Skip if using consolidated flow
+        if (useConsolidatedFlow) {
+          goNext();
+          return null;
+        }
         return (
           <RowSelection
             data={data}
@@ -415,6 +422,23 @@ export default function Main(props: CSVImporterProps) {
           />
         );
       case StepEnum.MapColumns:
+        // Use consolidated ConfigureImport component if enabled
+        if (useConsolidatedFlow) {
+          return (
+            <ConfigureImport
+              template={parsedTemplate}
+              data={data}
+              onSuccess={(mapping, headerRow) => {
+                setColumnMapping(mapping);
+                setSelectedHeaderRow(headerRow);
+                goNext();
+              }}
+              onCancel={() => goBack(StepEnum.Upload)}
+              isSubmitting={isSubmitting}
+            />
+          );
+        }
+        // Legacy flow
         return (
           <MapColumns
             template={parsedTemplate}
