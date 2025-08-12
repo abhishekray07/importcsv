@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useTranslation } from "../../../../i18n/useTranslation";
 import Checkbox from "../../../components/Checkbox";
 import { InputOption } from "../../../components/Input/types";
@@ -6,6 +6,7 @@ import DropdownFields from "../components/DropDownFields";
 import { TemplateColumn, UploadColumn } from "../../../types";
 import stringsSimilarity from "../../../utils/stringSimilarity";
 import { TemplateColumnMapping } from "../types";
+import { getMappingSuggestions } from "../../../services/mapping";
 import style from "../style/MapColumns.module.scss";
 
 
@@ -77,6 +78,84 @@ export default function useMapColumnsTable(
   const [selectedValues, setSelectedValues] = useState<{ key: string; selected: boolean | undefined }[]>(
     Object.values(values).map(({ key, selected }) => ({ key, selected }))
   );
+
+  // Track if LLM enhancement has been called to prevent multiple API calls
+  const llmEnhancementCalled = useRef(false);
+
+  // Enhance mappings with LLM suggestions after initial load
+  useEffect(() => {
+    const enhanceWithLLM = async () => {
+      // Skip if already called
+      if (llmEnhancementCalled.current) {
+        return;
+      }
+      
+      // Only run if we have columns, backend URL, and importer key
+      if (!uploadColumns.length || !templateColumns.length || !backendUrl || !importerKey) {
+        return;
+      }
+
+      // Mark as called to prevent duplicate requests
+      llmEnhancementCalled.current = true;
+
+      try {
+        // Get LLM-enhanced mapping suggestions
+        const suggestions = await getMappingSuggestions(
+          uploadColumns,
+          templateColumns,
+          backendUrl,
+          importerKey
+        );
+
+        if (suggestions.length > 0) {
+          // Apply high-confidence suggestions that don't override existing good matches
+          setValues((prevValues) => {
+            const newValues = { ...prevValues };
+            const usedTemplateKeys = new Set(
+              Object.values(prevValues)
+                .filter(v => v.key)
+                .map(v => v.key)
+            );
+
+            // Sort by confidence (highest first)
+            const sortedSuggestions = [...suggestions].sort((a, b) => b.confidence - a.confidence);
+
+            for (const suggestion of sortedSuggestions) {
+              // Only apply if:
+              // 1. Good confidence (>0.7)
+              // 2. No existing mapping or low-confidence string match
+              // 3. Template key not already used
+              const currentMapping = prevValues[suggestion.uploadIndex];
+              const hasWeakMatch = currentMapping?.key && !currentMapping?.selected;
+              
+              if (
+                suggestion.confidence > 0.7 &&
+                (!currentMapping?.key || hasWeakMatch) &&
+                !usedTemplateKeys.has(suggestion.templateKey)
+              ) {
+                newValues[suggestion.uploadIndex] = {
+                  key: suggestion.templateKey,
+                  include: true,
+                  selected: true
+                };
+                usedTemplateKeys.add(suggestion.templateKey);
+              }
+            }
+
+            // Update selected values
+            const templateFieldsObj = Object.values(newValues).map(({ key, selected }) => ({ key, selected }));
+            setSelectedValues(templateFieldsObj);
+
+            return newValues;
+          });
+        }
+      } catch (error) {
+        // Silently fail - fallback to string similarity is already applied
+      }
+    };
+
+    enhanceWithLLM();
+  }, [uploadColumns, templateColumns, backendUrl, importerKey]);
 
   const templateFields: { [key: string]: InputOption } = useMemo(
     () => templateColumns.reduce((acc, tc) => ({ ...acc, [tc.name]: { value: tc.key, required: tc.required } }), {}),

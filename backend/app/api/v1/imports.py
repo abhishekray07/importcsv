@@ -21,8 +21,15 @@ from app.services.import_service import (
 )
 from app.services.importer import get_importer_by_key
 from app.services.queue import enqueue_job
+from app.services.mapping import enhance_column_mappings
+from fastapi import Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 logger = logging.getLogger(__name__)
+
+# Rate limiter will be initialized from the app state
+limiter = Limiter(key_func=get_remote_address)
 
 # Router for user-authenticated endpoints
 router = APIRouter()
@@ -235,6 +242,63 @@ async def process_import_by_key(
         return ImportProcessResponse(
             success=True,
         )
+
+
+@key_router.post("/mapping-suggestions")
+@limiter.limit("20/hour")
+async def get_mapping_suggestions(
+    request_data: dict,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """
+    Get enhanced column mapping suggestions using LLM.
+    
+    This endpoint uses LiteLLM to intelligently map CSV columns to template fields
+    based on column names and sample data. It includes rate limiting and caching
+    to prevent abuse and reduce costs.
+    
+    Parameters:
+        request: Dict containing importerKey, uploadColumns, and templateColumns
+        db: Database session
+    
+    Returns:
+        Dict with success flag and list of mapping suggestions
+    """
+    try:
+        # Validate importer key
+        importer_key = request_data.get("importerKey")
+        if not importer_key:
+            return {"success": False, "mappings": []}
+        
+        # Verify the importer exists
+        importer = get_importer_by_key(db, importer_key)
+        
+        # Get client IP for rate limiting
+        # Note: In production, you might want to combine this with importer_key
+        # for more granular rate limiting
+        
+        upload_columns = request_data.get("uploadColumns", [])
+        template_columns = request_data.get("templateColumns", [])
+        
+        # Get enhanced mappings
+        mappings = await enhance_column_mappings(upload_columns, template_columns)
+        
+        return {
+            "success": True,
+            "mappings": mappings
+        }
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 404 for invalid key)
+        raise
+    except Exception as e:
+        logger.error(f"Error in mapping suggestions: {str(e)}")
+        # Return empty mappings on error - frontend will fallback to string similarity
+        return {
+            "success": False,
+            "mappings": []
+        }
 
 
 @key_router.get("/schema")

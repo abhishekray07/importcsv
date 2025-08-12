@@ -44,7 +44,7 @@ export default function Main(props: CSVImporterProps) {
   useCustomStyles(parseObjectOrStringJSON("customStyles", customStyles));
 
   // Stepper handler - using consolidated flow
-  const useConsolidatedFlow = true; // Feature flag for new consolidated flow
+  const useConsolidatedFlow = false; // Feature flag for new consolidated flow - set to false to test LLM in MapColumns
   const { currentStep, setStep, goNext, goBack, stepper, setStorageStep } = useStepNavigation(StepEnum.Upload, skipHeader, useConsolidatedFlow);
 
   // Error handling
@@ -96,7 +96,6 @@ export default function Main(props: CSVImporterProps) {
         }
 
         const schemaData = await response.json();
-        console.log('Fetched schema from backend:', schemaData);
 
         // Store the include_unmatched_columns setting from the importer configuration
         if (schemaData.include_unmatched_columns !== undefined) {
@@ -127,9 +126,9 @@ export default function Main(props: CSVImporterProps) {
             };
           }),
         };
-        console.log('Converted schema template:', schemaTemplate);
 
         const [parsedTemplate, parsedTemplateError] = convertRawTemplate(schemaTemplate);
+        
         if (parsedTemplateError) {
           setInitializationError(parsedTemplateError);
         } else if (parsedTemplate) {
@@ -422,6 +421,8 @@ export default function Main(props: CSVImporterProps) {
               }}
               onCancel={() => goBack(StepEnum.Upload)}
               isSubmitting={isSubmitting}
+              importerKey={importerKey}
+              backendUrl={backendUrl}
             />
           );
         }
@@ -438,9 +439,9 @@ export default function Main(props: CSVImporterProps) {
               goNext();
             }}
             isSubmitting={isSubmitting}
-            onCancel={skipHeader ? reload : () => goBack(StepEnum.RowSelection)}
             importerKey={importerKey}
             backendUrl={backendUrl}
+            onCancel={skipHeader ? reload : () => goBack(StepEnum.RowSelection)}
           />
         );
       case StepEnum.Validation:

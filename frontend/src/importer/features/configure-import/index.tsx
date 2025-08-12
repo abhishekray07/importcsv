@@ -29,6 +29,8 @@ interface ConfigureImportProps {
   onSuccess: (mapping: any, headerRow: number) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  importerKey?: string;
+  backendUrl?: string;
 }
 
 interface ColumnMapping {
@@ -45,6 +47,8 @@ export default function ConfigureImport({
   onSuccess,
   onCancel,
   isSubmitting = false,
+  importerKey,
+  backendUrl,
 }: ConfigureImportProps) {
   const { t } = useTranslation();
   const selectedHeaderRow = 0; // Always use first row as headers
