@@ -1,0 +1,82 @@
+// Base container styles shared across all feature components
+// This ensures consistent responsive behavior and overflow handling
+
+// Base container with responsive padding
+.baseContainer {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.5rem;
+  
+  // Tablet breakpoint
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+  
+  // Mobile breakpoint
+  @media (max-width: 640px) {
+    padding: 0.75rem;
+  }
+}
+
+// Flex container for components with vertical layout
+.flexContainer {
+  @extend .baseContainer;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Critical for nested flexbox to work properly
+  min-width: 0;  // Prevents flex items from overflowing
+}
+
+// Content area that needs scrolling
+.scrollableContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: visible; // Allow children to handle their own scrolling
+  max-width: 100%;
+  min-width: 0; // Allow shrinking
+}
+
+// Table/spreadsheet container for responsive tables
+.tableContainer {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+  
+  // Ensure tables can expand naturally
+  table {
+    min-width: 100%;
+    width: max-content;
+  }
+}
+
+// Header section (common across validation, configure, etc.)
+.headerSection {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+// Toolbar section (filters, actions, etc.)
+.toolbar {
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}

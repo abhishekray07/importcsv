@@ -4,12 +4,16 @@
   height: auto;
   min-height: 400px;
   padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .content {
   flex: 1;
   overflow: visible;
   min-width: 0;
+  width: 100%;
 }
 
 .status {

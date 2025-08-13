@@ -22,6 +22,7 @@ import Uploader from "../uploader";
 import { X } from "lucide-react";
 import { useTranslation } from "../../../i18n/useTranslation";
 import config from "../../../config";
+import IframeWrapper from "../../components/IframeWrapper";
 
 export default function Main(props: CSVImporterProps) {
   const {
@@ -35,6 +36,7 @@ export default function Main(props: CSVImporterProps) {
     backendUrl = config.apiBaseUrl,
     user,
     metadata,
+    useIframe = true, // Default to using iframe for CSS isolation
   } = props;
   const skipHeader = skipHeaderRowSelection ?? false;
 
@@ -467,7 +469,7 @@ export default function Main(props: CSVImporterProps) {
     }
   };
 
-  return (
+  const content = (
     <div className={style.wrapper}>
       <div>
         <Stepper {...stepper} />
@@ -492,6 +494,29 @@ export default function Main(props: CSVImporterProps) {
           <X className="h-5 w-5" />
         </button>
       )}
+    </div>
+  );
+
+  // Wrap in iframe for complete CSS isolation if enabled
+  if (useIframe) {
+    return (
+      <IframeWrapper className="importcsv-iframe">
+        {content}
+      </IframeWrapper>
+    );
+  }
+
+  // Legacy mode without iframe (for backwards compatibility)
+  return (
+    <div style={{
+      width: '100%',
+      overflow: 'visible',
+      position: 'relative',
+      isolation: 'isolate',
+      contain: 'layout style',
+      boxSizing: 'border-box'
+    }}>
+      {content}
     </div>
   );
 }

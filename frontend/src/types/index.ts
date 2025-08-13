@@ -29,6 +29,7 @@ export type CSVImporterProps = {
   backendUrl?: string; // URL of the backend API
   user?: Record<string, any>; // User details to identify the user in webhooks
   metadata?: Record<string, any>; // Additional data to associate with the import
+  useIframe?: boolean; // Whether to use iframe for CSS isolation (default: true)
   // You might want to explicitly allow specific data-* attributes if needed
   // 'data-testid'?: string;
 } & ModalParams;

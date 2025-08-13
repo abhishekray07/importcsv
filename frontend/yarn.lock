@@ -11174,6 +11174,11 @@ react-element-to-jsx-string@^15.0.0:
     is-plain-object "5.0.0"
     react-is "18.1.0"
 
+react-frame-component@^5.2.7:
+  version "5.2.7"
+  resolved "https://registry.npmjs.org/react-frame-component/-/react-frame-component-5.2.7.tgz"
+  integrity sha512-ROjHtSLoSVYUBfTieazj/nL8jIX9rZFmHC0yXEU+dx6Y82OcBEGgU9o7VyHMrBFUN9FuQ849MtIPNNLsb4krbg==
+
 react-hotkeys-hook@^5.1.0:
   version "5.1.0"
   resolved "https://registry.npmjs.org/react-hotkeys-hook/-/react-hotkeys-hook-5.1.0.tgz"
