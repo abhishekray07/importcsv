@@ -22,6 +22,7 @@ from app.services.import_service import (
 from app.services.importer import get_importer_by_key
 from app.services.queue import enqueue_job
 from app.services.mapping import enhance_column_mappings
+from app.services.transformation import generate_transformations
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -298,6 +299,118 @@ async def get_mapping_suggestions(
         return {
             "success": False,
             "mappings": []
+        }
+
+
+@key_router.post("/transform")
+@limiter.limit("20/hour")
+async def transform_data(
+    request_data: dict,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """
+    Generate data transformations based on natural language prompt.
+    
+    This endpoint uses LLM to understand transformation requests and generate
+    specific changes to apply to the data. Includes rate limiting and caching.
+    
+    Parameters:
+        request_data: Dict containing prompt, data, columnMapping, and optionally targetColumns
+        request: FastAPI request object
+        db: Database session
+    
+    Returns:
+        Dict with changes array and summary
+    """
+    try:
+        # Validate importer key
+        importer_key = request_data.get("importerKey")
+        if not importer_key:
+            return {
+                "success": False,
+                "error": "Importer key is required",
+                "changes": []
+            }
+        
+        # Verify the importer exists
+        importer = get_importer_by_key(db, importer_key)
+        
+        # Extract request data
+        prompt = request_data.get("prompt", "")
+        data = request_data.get("data", [])
+        column_mapping = request_data.get("columnMapping", {})
+        target_columns = request_data.get("targetColumns")
+        validation_errors = request_data.get("validationErrors")
+        
+        # Log incoming request details
+        logger.info(f"=== TRANSFORM API REQUEST ===")
+        logger.info(f"Importer: {importer_key}")
+        logger.info(f"Prompt: '{prompt}'")
+        logger.info(f"Data rows: {len(data)}")
+        logger.info(f"Column mapping: {list(column_mapping.keys())}")
+        logger.info(f"Target columns: {target_columns}")
+        logger.info(f"Validation errors: {len(validation_errors) if validation_errors else 0}")
+        
+        if validation_errors:
+            logger.debug(f"Validation error details (first 3): {validation_errors[:3]}...")
+        
+        # Validate prompt
+        if not prompt or len(prompt.strip()) < 3:
+            return {
+                "success": False,
+                "error": "Please provide a transformation description",
+                "changes": []
+            }
+        
+        # Limit data size for safety
+        max_rows = 1000
+        if len(data) > max_rows:
+            logger.warning(f"Data truncated from {len(data)} to {max_rows} rows")
+        
+        # Generate transformations
+        logger.info("Calling transformation service...")
+        result = await generate_transformations(
+            prompt=prompt,
+            data=data,
+            column_mapping=column_mapping,
+            target_columns=target_columns,
+            validation_errors=validation_errors,
+            max_rows=max_rows
+        )
+        
+        # Log result
+        logger.info(f"=== TRANSFORM API RESULT ===")
+        logger.info(f"Success: {not result.error}")
+        logger.info(f"Changes generated: {len(result.changes) if result.changes else 0}")
+        logger.info(f"Summary: {result.summary}")
+        if result.error:
+            logger.error(f"Error: {result.error}")
+        
+        # Return result
+        if result.error:
+            return {
+                "success": False,
+                "error": result.error,
+                "changes": []
+            }
+        
+        return {
+            "success": True,
+            "changes": result.changes,
+            "summary": result.summary,
+            "tokensUsed": result.tokens_used
+        }
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 404 for invalid key)
+        raise
+    except Exception as e:
+        logger.error(f"Error in data transformation: {str(e)}")
+        return {
+            "success": False,
+            "error": "Failed to generate transformations",
+            "changes": []
         }
 
 

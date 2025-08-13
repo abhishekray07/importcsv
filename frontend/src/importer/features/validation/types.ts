@@ -18,6 +18,7 @@ export interface ValidationProps {
   onCancel: () => void;
   isSubmitting: boolean;
   backendUrl?: string;
+  importerKey?: string;
   filterInvalidRows?: boolean;
   disableOnInvalidRows?: boolean;
 }

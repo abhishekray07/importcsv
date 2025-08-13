@@ -1,6 +1,8 @@
 import React, { useState, useMemo, FormEvent } from 'react';
 import { Button, Flex, Text, Box, Switch, Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import { PiSparkle } from 'react-icons/pi';
 import { ValidationProps } from './types';
+import TransformModal from './components/TransformModal';
 import style from './style/Validation.module.scss';
 
 
@@ -14,18 +16,21 @@ export default function Validation({
   onCancel,
   isSubmitting,
   backendUrl,
+  importerKey,
   filterInvalidRows,
   disableOnInvalidRows,
 }: ValidationProps) {
   // State management
-  const [editedValues, setEditedValues] = useState<Record<number, Record<number, any>>>({});
   const [errors, setErrors] = useState<Array<{rowIndex: number, columnIndex: number, message: string}>>([]);
   const [showOnlyErrors, setShowOnlyErrors] = useState(false);
+  const [isTransformModalOpen, setIsTransformModalOpen] = useState(false);
 
   // Data extraction
   const headerRowIndex = selectedHeaderRow || 0;
   const headerRow = fileData.rows[headerRowIndex];
-  const dataRows = fileData.rows.slice(headerRowIndex + 1);
+  
+  // Make dataRows a state variable so changes persist
+  const [dataRows, setDataRows] = useState(() => fileData.rows.slice(headerRowIndex + 1));
 
   // Column mapping
   const includedColumns = useMemo(() => {
@@ -41,13 +46,6 @@ export default function Validation({
 
   // Validation tracking
   const shouldValidateRef = React.useRef(true);
-
-  // Stable reference for edited values
-  const editedValuesRef = React.useRef(editedValues);
-  React.useEffect(() => {
-    editedValuesRef.current = editedValues;
-    shouldValidateRef.current = true;
-  }, [editedValues]);
 
   // Validate column mappings
   React.useEffect(() => {
@@ -91,10 +89,8 @@ export default function Validation({
           return;
         }
 
-        // Get the value (use edited value if available)
-        const originalValue = row.values[colIdx];
-        const editedValue = editedValuesRef.current[rowIdx]?.[colIdx];
-        const value = editedValue !== undefined ? editedValue : originalValue;
+        // Get the value directly from the row
+        const value = row.values[colIdx];
 
         // Access field properties safely
         const fieldAny = field as any;
@@ -233,20 +229,25 @@ export default function Validation({
 
   // Cell editing
   const handleCellEdit = React.useCallback((rowIdx: number, colIdx: number, value: string) => {
-    setEditedValues(prev => {
-      // Only update if value actually changed
-      const currentValue = prev[rowIdx]?.[colIdx];
-      if (currentValue === value) return prev;
-
-      return {
-        ...prev,
-        [rowIdx]: {
-          ...(prev[rowIdx] || {}),
-          [colIdx]: value
-        }
-      };
+    // Only update if value actually changed
+    if (dataRows[rowIdx]?.values[colIdx] === value) return;
+    
+    // Create a copy of dataRows and update the specific value
+    setDataRows(prevRows => {
+      const updatedRows = [...prevRows];
+      if (updatedRows[rowIdx] && updatedRows[rowIdx].values) {
+        // Deep copy the specific row to avoid mutation
+        updatedRows[rowIdx] = {
+          ...updatedRows[rowIdx],
+          values: [...updatedRows[rowIdx].values]
+        };
+        updatedRows[rowIdx].values[colIdx] = value;
+      }
+      return updatedRows;
     });
-  }, []);
+    
+    shouldValidateRef.current = true;
+  }, [dataRows]);
 
   // Row filtering
   const visibleRows = useMemo(() => {
@@ -287,24 +288,10 @@ export default function Validation({
       return; // Don't submit if disableOnInvalidRows is true and there are errors
     }
 
-    // Update the data with edited values
-    const updatedData = dataRows.map((row, rowIdx) => {
-      // Apply edited values to this row
-      const values = [...row.values];
-
-      if (editedValues[rowIdx]) {
-        Object.entries(editedValues[rowIdx]).forEach(([colIdx, value]) => {
-          values[parseInt(colIdx)] = value;
-        });
-      }
-
-      return { ...row, values };
-    });
-
     // Filter out rows with errors if filterInvalidRows is enabled
     const filteredData = filterInvalidRows
-      ? updatedData.filter((_, rowIdx) => !errorTracking.indices.has(rowIdx))
-      : updatedData;
+      ? dataRows.filter((_, rowIdx) => !errorTracking.indices.has(rowIdx))
+      : dataRows;
 
     // Call onSuccess with the updated data
     onSuccess({
@@ -353,7 +340,18 @@ export default function Validation({
                 </Text>
               )}
             </Flex>
-            <Flex gap={2}>
+            <Flex gap={2} align="center">
+              {backendUrl && importerKey && (
+                <Button
+                  size="sm"
+                  leftIcon={<PiSparkle />}
+                  onClick={() => setIsTransformModalOpen(true)}
+                  variant="outline"
+                  colorScheme="blue"
+                >
+                  Transform with AI
+                </Button>
+              )}
               <Text fontSize="xs" color="gray.500">
                 {visibleRows.length} of {dataRows.length} rows
               </Text>
@@ -386,9 +384,7 @@ export default function Validation({
                         <span>{displayRowIndex + 1}</span>
                       </td>
                       {includedColumns.map((colIdx, idx) => {
-                        const originalValue = row.values[colIdx];
-                        const editedValue = editedValues[actualRowIdx]?.[colIdx];
-                        const value = editedValue !== undefined ? editedValue : originalValue;
+                        const value = row.values[colIdx];
 
                         const error = errors.find(
                           err => err.rowIndex === displayRowIndex && err.columnIndex === colIdx
@@ -459,7 +455,78 @@ export default function Validation({
         </form>
       </div>
 
-
+      {/* Transform Modal */}
+      {backendUrl && importerKey && (
+        <TransformModal
+          isOpen={isTransformModalOpen}
+          onClose={() => setIsTransformModalOpen(false)}
+          data={dataRows}
+          columnMapping={columnMapping}
+          backendUrl={backendUrl}
+          importerKey={importerKey}
+          validationErrors={errors.map(e => {
+            // Convert display row index to data array index
+            const dataRowIndex = e.rowIndex - headerRowIndex - 1;
+            return {
+              rowIndex: dataRowIndex,
+              columnKey: columnMapping[e.columnIndex]?.key || '',
+              message: e.message,
+              value: dataRows[dataRowIndex]?.values[e.columnIndex]
+            };
+          })}
+          onApplyTransformations={(changes) => {
+            console.log('=== APPLYING TRANSFORMATIONS ===');
+            console.log('Total changes received:', changes.length);
+            console.log('Current dataRows length:', dataRows.length);
+            
+            // Create a copy of dataRows and apply all changes
+            const updatedRows = [...dataRows];
+            let appliedCount = 0;
+            let skippedCount = 0;
+            
+            changes.forEach((change) => {
+              const { rowIndex, columnIndex, newValue } = change;
+              
+              // Skip if columnIndex is undefined
+              if (columnIndex === undefined) {
+                console.warn(`Skipping change for row ${rowIndex}: columnIndex is undefined`);
+                skippedCount++;
+                return;
+              }
+              
+              // Validate row index
+              if (rowIndex < 0 || rowIndex >= updatedRows.length) {
+                console.warn(`Skipping change: rowIndex ${rowIndex} out of bounds (dataRows has ${updatedRows.length} rows)`);
+                skippedCount++;
+                return;
+              }
+              
+              // Apply the change
+              if (updatedRows[rowIndex] && updatedRows[rowIndex].values) {
+                // Deep copy the row to avoid mutation issues
+                if (updatedRows[rowIndex] === dataRows[rowIndex]) {
+                  updatedRows[rowIndex] = {
+                    ...updatedRows[rowIndex],
+                    values: [...updatedRows[rowIndex].values]
+                  };
+                }
+                updatedRows[rowIndex].values[columnIndex] = newValue;
+                appliedCount++;
+                console.log(`Applied change to row ${rowIndex}, column ${columnIndex}: ${newValue}`);
+              }
+            });
+            
+            console.log(`=== TRANSFORMATION SUMMARY ===`);
+            console.log(`Applied: ${appliedCount} changes`);
+            console.log(`Skipped: ${skippedCount} changes`);
+            
+            // Update the state with all changes at once
+            setDataRows(updatedRows);
+            shouldValidateRef.current = true;
+            setIsTransformModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

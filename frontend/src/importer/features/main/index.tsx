@@ -455,6 +455,7 @@ export default function Main(props: CSVImporterProps) {
             onCancel={handleBackToMapColumns}
             isSubmitting={isSubmitting}
             backendUrl={backendUrl}
+            importerKey={importerKey}
             filterInvalidRows={filterInvalidRows}
             disableOnInvalidRows={disableOnInvalidRows}
           />
