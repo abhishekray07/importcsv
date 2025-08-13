@@ -1,5 +1,5 @@
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Button } from "@chakra-ui/button";
+import { Button } from "../../components/ui/button";
 import Box from "../../components/Box";
 import { CompleteProps } from "./types";
 import style from "./style/Complete.module.scss";
@@ -15,11 +15,13 @@ export default function Complete({ reload, close, isModal }: CompleteProps) {
         </span>
         <div>{t("Import Successful")}</div>
         <div className={style.actions}>
-          <Button type="button" colorScheme="secondary" leftIcon={<PiArrowCounterClockwise />} onClick={reload}>
+          <Button type="button" variant="outline" onClick={reload}>
+            <PiArrowCounterClockwise className="mr-2 h-4 w-4" />
             {t("Upload another file")}
           </Button>
           {isModal && (
-            <Button type="button" colorScheme="primary" leftIcon={<PiCheckBold />} onClick={close}>
+            <Button type="button" onClick={close}>
+              <PiCheckBold className="mr-2 h-4 w-4" />
               {t("Done")}
             </Button>
           )}

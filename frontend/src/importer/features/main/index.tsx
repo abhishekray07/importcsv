@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Button, IconButton } from "@chakra-ui/react";
+import { Button } from "../../components/ui/button";
 import Errors from "../../components/Errors";
 import Stepper from "../../components/Stepper";
 import Validation from "../validation/Validation";
@@ -19,7 +19,7 @@ import MapColumns from "../map-columns";
 import RowSelection from "../row-selection";
 import ConfigureImport from "../configure-import";
 import Uploader from "../uploader";
-import { PiX } from "react-icons/pi";
+import { X } from "lucide-react";
 import { useTranslation } from "../../../i18n/useTranslation";
 import config from "../../../config";
 
@@ -44,7 +44,7 @@ export default function Main(props: CSVImporterProps) {
   useCustomStyles(parseObjectOrStringJSON("customStyles", customStyles));
 
   // Stepper handler - using consolidated flow
-  const useConsolidatedFlow = false; // Feature flag for new consolidated flow - set to false to test LLM in MapColumns
+  const useConsolidatedFlow = true; // Using consolidated flow to combine header selection and mapping
   const { currentStep, setStep, goNext, goBack, stepper, setStorageStep } = useStepNavigation(StepEnum.Upload, skipHeader, useConsolidatedFlow);
 
   // Error handling
@@ -483,7 +483,15 @@ export default function Main(props: CSVImporterProps) {
         </div>
       )}
 
-      {isModal && <IconButton isRound className={style.close} colorScheme="secondary" aria-label="Close" icon={<PiX />} onClick={requestClose} />}
+      {isModal && (
+        <button
+          className={`${style.close} rounded-full p-2 hover:bg-gray-100 transition-colors`}
+          aria-label="Close"
+          onClick={requestClose}
+        >
+          <X className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 }

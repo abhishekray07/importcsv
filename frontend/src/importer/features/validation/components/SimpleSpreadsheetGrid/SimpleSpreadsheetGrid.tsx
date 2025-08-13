@@ -6,24 +6,13 @@ import {
   ColumnDef,
   RowData,
 } from '@tanstack/react-table';
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Input,
-  Flex,
-  Text,
-  Switch,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-  Box,
-  Button,
-} from '@chakra-ui/react';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { Box, Flex, Text } from '../../../../components/ui/flex';
+import { Switch } from '../../../../components/ui/switch';
+import { Alert, AlertTitle, AlertDescription } from '../../../../components/ui/alert';
+// Using native HTML table elements for now
+// TODO: Consider adding table components from shadcn/ui
 import { useTranslation } from '../../../../../i18n/useTranslation';
 import './SimpleSpreadsheetGrid.scss';
 
@@ -88,10 +77,8 @@ const EditableCell: React.FC<{
             setIsEditing(false);
           }
         }}
-        size="sm"
         autoFocus
-        variant="unstyled"
-        px={2}
+        className="text-sm px-2 border-none bg-transparent focus:ring-0"
       />
     );
   }
@@ -99,17 +86,12 @@ const EditableCell: React.FC<{
   return (
     <Flex
       onClick={() => setIsEditing(true)}
-      cursor="pointer"
-      px={2}
-      py={1}
-      className={hasError ? 'cell-with-error' : ''}
-      align="center"
-      justify="space-between"
+      className={`cursor-pointer px-2 py-1 items-center justify-between ${hasError ? 'cell-with-error' : ''}`}
       title={hasError ? errorMessage : undefined}
     >
-      <Text fontSize="sm" flex="1">{value || ''}</Text>
+      <Text className="text-sm flex-1">{value || ''}</Text>
       {hasError && (
-        <Box className="error-indicator" ml={2}>!</Box>
+        <Box className="error-indicator ml-2">!</Box>
       )}
     </Flex>
   );
@@ -190,7 +172,7 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
         accessorKey: '_rowNumber',
         size: 50,
         cell: ({ getValue }) => (
-          <Text fontSize="sm" fontWeight="medium" color="gray.600">
+          <Text className="text-sm font-medium text-gray-600">
             {String(getValue())}
           </Text>
         ),
@@ -237,15 +219,15 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
   return (
     <div className="simple-spreadsheet-grid-container">
       <div className="spreadsheet-toolbar">
-        <Flex justify="space-between" align="center" mb={4}>
-          <Flex align="center" gap={4}>
-            <Text fontSize="sm" fontWeight="medium">
+        <Flex justify="between" align="center" className="mb-4">
+          <Flex align="center" className="gap-4">
+            <Text className="text-sm font-medium">
               {errors.length > 0 ? (
-                <Text as="span" color="red.500">
+                <Text className="text-red-500">
                   {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
                 </Text>
               ) : (
-                <Text as="span" color="green.500">
+                <Text className="text-green-500">
                   No errors found
                 </Text>
               )}
@@ -253,18 +235,18 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
             <Flex align="center">
               <Switch
                 id="show-errors-only"
-                isChecked={showOnlyErrors}
-                onChange={(e) => onShowOnlyErrorsChange(e.target.checked)}
-                mr={2}
+                checked={showOnlyErrors}
+                onCheckedChange={onShowOnlyErrorsChange}
+                className="mr-2"
               />
-              <Text fontSize="sm">Show only rows with errors</Text>
+              <Text className="text-sm">Show only rows with errors</Text>
             </Flex>
           </Flex>
-          <Flex gap={2}>
-            <Button size="sm" variant="outline" isDisabled>
+          <Flex className="gap-2">
+            <Button size="sm" variant="outline" disabled>
               Find & Replace
             </Button>
-            <Button size="sm" variant="outline" isDisabled>
+            <Button size="sm" variant="outline" disabled>
               Bulk Actions
             </Button>
           </Flex>
@@ -272,8 +254,7 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
       </div>
 
       {filterInvalidRows && errorRowIndices.size > 0 && (
-        <Alert status="warning" variant="left-accent" mb={4}>
-          <AlertIcon />
+        <Alert className="mb-4 border-l-4 border-orange-500 bg-orange-50">
           <Box>
             <AlertTitle>{t('validation.invalidRowsWarning', 'Invalid Rows Will Be Filtered')}</AlertTitle>
             <AlertDescription>
@@ -317,7 +298,7 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
         </Table>
         
         {tableData.length === 0 && (
-          <Box p={8} textAlign="center">
+          <Box className="p-8 text-center">
             <Text>No data to display. Please check your CSV file and column mappings.</Text>
           </Box>
         )}

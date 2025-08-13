@@ -6,6 +6,9 @@ import image from "@rollup/plugin-image";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
+import postcssImport from "postcss-import";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
 
 const packageJson = require("./package.json");
 
@@ -38,7 +41,18 @@ export default {
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
     image(),
-    postcss({}),
+    postcss({
+      plugins: [
+        postcssImport(),
+        tailwindcss(),
+        autoprefixer(),
+      ],
+      extensions: ['.css', '.scss'],
+      extract: false,
+      inject: true,
+      modules: false,
+      use: ['sass'],
+    }),
     json(),
   ],
 };

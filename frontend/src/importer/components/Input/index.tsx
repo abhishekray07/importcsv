@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Portal } from "@chakra-ui/react";
+import { createPortal } from 'react-dom';
 import useClickOutside from "../../hooks/useClickOutside";
 import useRect from "../../hooks/useRect";
 import useWindowSize from "../../hooks/useWindowSize";

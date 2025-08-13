@@ -25,7 +25,7 @@ $focus-color: #3b82f6;
 }
 
 .header {
-  padding: 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid $border-color;
   
   h2 {
@@ -46,7 +46,7 @@ $focus-color: #3b82f6;
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1rem;
   overflow: hidden;
   min-width: 0;
 }

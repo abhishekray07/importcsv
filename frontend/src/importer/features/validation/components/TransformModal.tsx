@@ -1,29 +1,17 @@
 import React, { useState, useCallback, useRef } from 'react';
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
-  Button,
-  Input,
-  VStack,
-  HStack,
-  Text,
-  Box,
-  Checkbox,
-  Alert,
-  AlertIcon,
-  Spinner,
-  Badge,
-  IconButton,
-  Divider,
-  Flex,
-  useToast,
-} from '@chakra-ui/react';
-import { PiSparkle, PiX, PiCheck } from 'react-icons/pi';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Alert, AlertDescription } from '../../../components/ui/alert';
+import { useToast } from '../../../components/ui/use-toast';
+import { PiSparkle, PiX, PiCheck, PiInfo } from 'react-icons/pi';
 import { useTranslation } from '../../../../i18n/useTranslation';
 import {
   generateTransformations,
@@ -61,7 +49,7 @@ export default function TransformModal({
   onApplyTransformations
 }: TransformModalProps) {
   const { t } = useTranslation();
-  const toast = useToast();
+  const { toast } = useToast();
   const promptInputRef = useRef<HTMLInputElement>(null);
 
   // State
@@ -122,9 +110,6 @@ export default function TransformModal({
     toast({
       title: 'Transformations applied',
       description: `${selectedChanges.length} changes applied successfully`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
     });
     
     onClose();
@@ -161,194 +146,172 @@ export default function TransformModal({
   const hasChanges = changes.length > 0;
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={handleClose} 
-      size="xl"
-      closeOnOverlayClick={false}
-    >
-      <ModalOverlay />
-      <ModalContent maxW="800px">
-        <ModalHeader>
-          <HStack>
-            <PiSparkle />
-            <Text>{t('Transform data with AI')}</Text>
-          </HStack>
-        </ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-[800px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <PiSparkle className="h-5 w-5" />
+            {t('Transform data with AI')}
+          </DialogTitle>
+        </DialogHeader>
         
-        <ModalBody>
-          <VStack spacing={4} align="stretch">
+        <div className="space-y-4">
             {/* Show validation error context if available */}
             {validationErrors && validationErrors.length > 0 && (
-              <Alert status="info" borderRadius="md">
-                <AlertIcon />
-                <Text fontSize="sm">
+              <Alert>
+                <PiInfo className="h-4 w-4" />
+                <AlertDescription>
                   {validationErrors.length} validation error{validationErrors.length > 1 ? 's' : ''} detected. 
                   Mention "fix errors" to focus on these rows.
-                </Text>
+                </AlertDescription>
               </Alert>
             )}
             
             {/* Prompt Input */}
-            <Box>
-              <HStack spacing={2} mb={2}>
+            <div>
+              <div className="flex gap-2 mb-2">
                 <Input
                   ref={promptInputRef}
                   placeholder={t("Describe the transformation (e.g., 'Convert dates to MM/DD/YYYY')")}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
-                  isDisabled={isGenerating}
-                  size="lg"
+                  disabled={isGenerating}
+                  className="h-10"
                 />
                 <Button
-                  colorScheme="blue"
                   onClick={handleGenerate}
                   isLoading={isGenerating}
-                  loadingText={t('Generating')}
-                  leftIcon={<PiSparkle />}
+                  disabled={isGenerating}
                 >
-                  {t('Generate')}
+                  <PiSparkle className="mr-2 h-4 w-4" />
+                  {isGenerating ? t('Generating') : t('Generate')}
                 </Button>
-              </HStack>
+              </div>
               
               {/* Example prompts */}
-              <Button
-                size="xs"
-                variant="link"
+              <button
+                className="text-xs text-blue-600 hover:underline"
                 onClick={() => setShowExamples(!showExamples)}
               >
                 {showExamples ? t('Hide examples') : t('Show examples')}
-              </Button>
+              </button>
               
               {showExamples && (
-                <Box mt={2} p={2} bg="gray.50" borderRadius="md">
-                  <Text fontSize="xs" mb={1} fontWeight="bold">
+                <div className="mt-2 p-2 bg-gray-50 rounded-md">
+                  <p className="text-xs mb-1 font-bold">
                     {t('Click to use:')}
-                  </Text>
-                  <Flex flexWrap="wrap" gap={1}>
+                  </p>
+                  <div className="flex flex-wrap gap-1">
                     {COMMON_PROMPTS.slice(0, 5).map((example, i) => (
-                      <Badge
+                      <span
                         key={i}
-                        cursor="pointer"
+                        className="px-2 py-1 text-xs bg-gray-200 rounded cursor-pointer hover:bg-blue-100"
                         onClick={() => handleUseExample(example)}
-                        _hover={{ bg: 'blue.100' }}
                       >
                         {example}
-                      </Badge>
+                      </span>
                     ))}
-                  </Flex>
-                </Box>
+                  </div>
+                </div>
               )}
-            </Box>
+            </div>
 
             {/* Error Alert */}
             {error && (
-              <Alert status="error" borderRadius="md">
-                <AlertIcon />
-                {error}
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             {/* Loading State */}
             {isGenerating && (
-              <Box textAlign="center" py={8}>
-                <Spinner size="lg" color="blue.500" />
-                <Text mt={2} color="gray.600">
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p className="mt-2 text-gray-600">
                   {t('Analyzing data and generating transformations...')}
-                </Text>
-              </Box>
+                </p>
+              </div>
             )}
 
             {/* Changes Preview */}
             {hasChanges && !isGenerating && (
               <>
-                <Box>
-                  <HStack justify="space-between" mb={2}>
-                    <Text fontWeight="bold">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-bold">
                       {summary || `${changes.length} transformations`}
-                    </Text>
-                    <HStack>
+                    </span>
+                    <div className="flex gap-2">
                       <Button
-                        size="xs"
+                        size="sm"
                         variant="outline"
                         onClick={() => handleSelectAll(true)}
                       >
                         {t('Select all')}
                       </Button>
                       <Button
-                        size="xs"
+                        size="sm"
                         variant="outline"
                         onClick={() => handleSelectAll(false)}
                       >
                         {t('Deselect all')}
                       </Button>
-                    </HStack>
-                  </HStack>
+                    </div>
+                  </div>
                   
-                  <Box
-                    maxH="300px"
-                    overflowY="auto"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    borderRadius="md"
-                    p={2}
-                  >
-                    <VStack spacing={1} align="stretch">
+                  <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-md p-2">
+                    <div className="space-y-1">
                       {changes.slice(0, 100).map((change, index) => (
-                        <HStack
+                        <div
                           key={index}
-                          p={2}
-                          bg={change.selected ? 'blue.50' : 'white'}
-                          borderRadius="md"
-                          border="1px solid"
-                          borderColor={change.selected ? 'blue.200' : 'gray.100'}
-                          cursor="pointer"
+                          className={`flex items-start gap-2 p-2 rounded-md border cursor-pointer ${
+                            change.selected
+                              ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+                              : 'bg-white border-gray-100 hover:bg-gray-50'
+                          }`}
                           onClick={() => handleToggleChange(index)}
-                          _hover={{ bg: change.selected ? 'blue.100' : 'gray.50' }}
                         >
                           <Checkbox
-                            isChecked={change.selected}
-                            onChange={() => handleToggleChange(index)}
+                            checked={change.selected}
+                            onCheckedChange={() => handleToggleChange(index)}
                             onClick={(e) => e.stopPropagation()}
                           />
-                          <VStack align="start" flex={1} spacing={0}>
-                            <HStack fontSize="sm" color="gray.900">
-                              <Text as="span" textDecoration="line-through">
+                          <div className="flex-1 space-y-0">
+                            <div className="text-sm text-gray-900 flex items-center gap-2">
+                              <span className="line-through">
                                 {String(change.oldValue || 'empty')}
-                              </Text>
-                              <Text as="span">→</Text>
-                              <Text as="span" color="green.600" fontWeight="bold">
+                              </span>
+                              <span>→</span>
+                              <span className="text-green-600 font-bold">
                                 {String(change.newValue)}
-                              </Text>
-                            </HStack>
-                            <Text fontSize="xs" color="gray.600">
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600">
                               Row {change.rowIndex + 1}, {change.columnKey}
-                            </Text>
-                          </VStack>
-                        </HStack>
+                            </p>
+                          </div>
+                        </div>
                       ))}
                       
                       {changes.length > 100 && (
-                        <Text fontSize="sm" color="gray.500" textAlign="center">
+                        <p className="text-sm text-gray-500 text-center">
                           {t(`Showing first 100 of ${changes.length} changes`)}
-                        </Text>
+                        </p>
                       )}
-                    </VStack>
-                  </Box>
+                    </div>
+                  </div>
                   
-                  <Text fontSize="sm" color="gray.600" mt={1}>
+                  <p className="text-sm text-gray-600 mt-1">
                     {selectedCount} {t('selected')}
-                  </Text>
-                </Box>
+                  </p>
+                </div>
               </>
             )}
-          </VStack>
-        </ModalBody>
+        </div>
 
-        <ModalFooter>
-          <HStack spacing={3}>
+        <DialogFooter>
+          <div className="flex gap-3">
             <Button variant="outline" onClick={handleClose}>
               {t('Cancel')}
             </Button>
@@ -358,22 +321,21 @@ export default function TransformModal({
                 <Button
                   variant="outline"
                   onClick={() => handleApply(false)}
-                  isDisabled={selectedCount === 0}
+                  disabled={selectedCount === 0}
                 >
                   {t(`Apply ${selectedCount} selected`)}
                 </Button>
                 <Button
-                  colorScheme="blue"
                   onClick={() => handleApply(true)}
-                  leftIcon={<PiCheck />}
                 >
+                  <PiCheck className="mr-2 h-4 w-4" />
                   {t('Apply all')}
                 </Button>
               </>
             )}
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

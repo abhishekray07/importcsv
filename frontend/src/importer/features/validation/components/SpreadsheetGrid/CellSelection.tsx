@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box } from '../../../../components/ui/flex';
 
 interface CellPosition {
   row: number;
@@ -37,17 +37,13 @@ export const CellSelection: React.FC<CellSelectionProps> = ({ selection, cellRef
 
   return (
     <Box
-      position="fixed"
-      left={`${left}px`}
-      top={`${top}px`}
-      width={`${right - left}px`}
-      height={`${bottom - top}px`}
-      border="2px solid"
-      borderColor="blue.500"
-      backgroundColor="blue.50"
-      opacity={0.3}
-      pointerEvents="none"
-      zIndex={1000}
+      className="fixed border-2 border-blue-500 bg-blue-50 opacity-30 pointer-events-none z-[1000]"
+      style={{
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${right - left}px`,
+        height: `${bottom - top}px`,
+      }}
     />
   );
 };

@@ -3,13 +3,13 @@
   flex-direction: column;
   height: auto;
   min-height: 400px;
-  padding: 12px 8px 8px 8px;
+  padding: 16px;
 }
 
 .content {
-  padding: 12px;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  min-width: 0;
 }
 
 .status {

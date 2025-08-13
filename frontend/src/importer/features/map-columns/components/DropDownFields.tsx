@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Select } from "@chakra-ui/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { InputOption } from "../../../components/Input/types";
 
 type DropdownFieldsProps = {
@@ -76,19 +82,18 @@ export default function DropdownFields({
   const isEmpty = Object.keys(filteredOptions).length === 0;
 
   return (
-    <Select 
-      value={selectedOption} 
-      onChange={(e) => handleValueChange(e.target.value)}
-      isDisabled={isEmpty}
-      placeholder={placeholder}
-      size="sm"
-    >
-      <option value="__placeholder__">{placeholder}</option>
-      {Object.entries(filteredOptions).map(([key, option]) => (
-        <option key={String(option.value)} value={String(option.value || "__empty__")}>
-          {key}{option.required && " *"}
-        </option>
-      ))}
+    <Select value={selectedOption} onValueChange={handleValueChange} disabled={isEmpty}>
+      <SelectTrigger className="h-9">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="__placeholder__">{placeholder}</SelectItem>
+        {Object.entries(filteredOptions).map(([key, option]) => (
+          <SelectItem key={String(option.value)} value={String(option.value || "__empty__")}>
+            {key}{option.required && " *"}
+          </SelectItem>
+        ))}
+      </SelectContent>
     </Select>
   );
 }

@@ -35,7 +35,7 @@
   border-radius: 1rem;
   width: 80vw;
   max-height: 80vh;
-  min-width: 907px;
+  min-width: 800px;
   border: none;
   position: fixed;
   inset: 0;
@@ -54,7 +54,8 @@
 
 @media (max-width: 768px) {
   .CSVImporter-dialog {
-    width: 90vw;
-    min-width: 950px;
+    width: 95vw;
+    min-width: unset;
+    max-width: 100%;
   }
 }

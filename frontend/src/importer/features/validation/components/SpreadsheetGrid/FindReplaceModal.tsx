@@ -1,23 +1,27 @@
 import React, { useState, useCallback } from 'react';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { HStack, VStack, Text } from '../../../../components/ui/flex';
+import { useToast } from '../../../../components/ui/use-toast';
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from '../../../../components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../components/ui/select';
+import {
+  Checkbox,
   FormControl,
   FormLabel,
-  Input,
-  Button,
-  Checkbox,
-  VStack,
-  HStack,
-  Text,
-  useToast,
-  Select,
-} from '@chakra-ui/react';
+} from '../../../../components/ui/flex'; // Some form components remain for now
 
 interface FindReplaceModalProps {
   isOpen: boolean;
@@ -168,91 +172,100 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
   }, [findMatches, toast]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Find & Replace</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Find & Replace</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
           <VStack spacing={4}>
-            <FormControl>
-              <FormLabel>Find</FormLabel>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Find</label>
               <Input
                 value={findText}
                 onChange={(e) => setFindText(e.target.value)}
                 placeholder="Enter text to find"
                 autoFocus
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
-              <FormLabel>Replace with</FormLabel>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Replace with</label>
               <Input
                 value={replaceText}
                 onChange={(e) => setReplaceText(e.target.value)}
                 placeholder="Enter replacement text"
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
-              <FormLabel>Search in column</FormLabel>
-              <Select
-                value={selectedColumn ?? ''}
-                onChange={(e) => setSelectedColumn(e.target.value ? parseInt(e.target.value) : null)}
-              >
-                <option value="">All columns</option>
-                {includedColumns.map(colIdx => (
-                  <option key={colIdx} value={colIdx}>
-                    Column {colIdx + 1}
-                  </option>
-                ))}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Search in column</label>
+              <Select value={selectedColumn?.toString() ?? ''} onValueChange={(value) => setSelectedColumn(value ? parseInt(value) : null)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All columns" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All columns</SelectItem>
+                  {includedColumns.map(colIdx => (
+                    <SelectItem key={colIdx} value={colIdx.toString()}>
+                      Column {colIdx + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-            </FormControl>
+            </div>
 
-            <VStack align="start" width="100%">
-              <Checkbox
-                isChecked={caseSensitive}
-                onChange={(e) => setCaseSensitive(e.target.checked)}
-              >
-                Case sensitive
-              </Checkbox>
-              <Checkbox
-                isChecked={wholeWord}
-                onChange={(e) => setWholeWord(e.target.checked)}
-                isDisabled={useRegex}
-              >
-                Match whole word
-              </Checkbox>
-              <Checkbox
-                isChecked={useRegex}
-                onChange={(e) => setUseRegex(e.target.checked)}
-              >
-                Use regular expressions
-              </Checkbox>
-            </VStack>
+            <div className="flex flex-col items-start w-full space-y-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={caseSensitive}
+                  onChange={(e) => setCaseSensitive(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Case sensitive</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={wholeWord}
+                  onChange={(e) => setWholeWord(e.target.checked)}
+                  disabled={useRegex}
+                  className="rounded"
+                />
+                <span className="text-sm">Match whole word</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={useRegex}
+                  onChange={(e) => setUseRegex(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Use regular expressions</span>
+              </label>
+            </div>
 
             {matchCount > 0 && (
-              <Text fontSize="sm" color="gray.600">
+              <Text className="text-sm text-gray-600">
                 {matchCount} match{matchCount !== 1 ? 'es' : ''} found
               </Text>
             )}
           </VStack>
-        </ModalBody>
-
-        <ModalFooter>
-          <HStack spacing={3}>
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleFind}>
-              Find
-            </Button>
-            <Button colorScheme="blue" onClick={handleReplace}>
-              Replace All
-            </Button>
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </div>
+        
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4 border-t">
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="outline" onClick={handleFind}>
+            Find
+          </Button>
+          <Button onClick={handleReplace}>
+            Replace All
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -8,41 +8,21 @@ import {
   Cell,
   Row,
 } from '@tanstack/react-table';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { Box, Flex, Text, HStack, VStack } from '../../../../components/ui/flex';
+import { Switch } from '../../../../components/ui/switch';
+import { Alert, AlertTitle, AlertDescription } from '../../../../components/ui/alert';
+import { useToast } from '../../../../components/ui/use-toast';
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Input,
-  Flex,
-  Text,
-  Switch,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
-  FormControl,
-  FormLabel,
-  Checkbox,
-  HStack,
-  VStack,
-} from '@chakra-ui/react';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../../components/ui/dialog';
+// Using native HTML table elements and custom components
+// TODO: Consider adding more components from shadcn/ui
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useImmer } from 'use-immer';
 import { produce } from 'immer';
@@ -170,10 +150,7 @@ const EditableCell: React.FC<{
           onChange={(e) => setValue(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          size="sm"
-          variant="unstyled"
-          px={2}
-          height="100%"
+          className="text-sm h-full px-2 border-none bg-transparent focus:ring-0"
         />
       </div>
     );
@@ -190,7 +167,7 @@ const EditableCell: React.FC<{
       }}
       tabIndex={0}
     >
-      <Text fontSize="sm" userSelect="none" flex="1">
+      <Text className="text-sm select-none flex-1">
         {value || ''}
       </Text>
       {hasError && (
@@ -515,7 +492,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
         accessorKey: '_rowNumber',
         size: 50,
         cell: ({ getValue }) => (
-          <Text fontSize="xs" fontWeight="medium" color="gray.600" textAlign="center" width="100%">
+          <Text className="text-xs font-medium text-gray-600 text-center w-full">
             {String(getValue())}
           </Text>
         ),
@@ -583,15 +560,15 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
   return (
     <div className="spreadsheet-grid-container">
       <div className="spreadsheet-toolbar">
-        <Flex justify="space-between" align="center" mb={4}>
-          <Flex align="center" gap={4}>
-            <Text fontSize="sm" fontWeight="medium">
+        <Flex justify="between" align="center" className="mb-4">
+          <Flex align="center" className="gap-4">
+            <Text className="text-sm font-medium">
               {errors.length > 0 ? (
-                <Text as="span" color="red.500">
+                <Text className="text-red-500">
                   {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
                 </Text>
               ) : (
-                <Text as="span" color="green.500">
+                <Text className="text-green-500">
                   No errors found
                 </Text>
               )}
@@ -599,11 +576,11 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
             <Flex align="center">
               <Switch
                 id="show-errors-only"
-                isChecked={showOnlyErrors}
-                onChange={(e) => onShowOnlyErrorsChange(e.target.checked)}
-                mr={2}
+                checked={showOnlyErrors}
+                onCheckedChange={onShowOnlyErrorsChange}
+                className="mr-2"
               />
-              <Text fontSize="sm">Show only rows with errors</Text>
+              <Text className="text-sm">Show only rows with errors</Text>
             </Flex>
           </Flex>
           <div></div>
@@ -611,8 +588,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
       </div>
 
       {filterInvalidRows && errorRowIndices.size > 0 && (
-        <Alert status="warning" variant="left-accent" mb={4}>
-          <AlertIcon />
+        <Alert className="mb-4 border-l-4 border-orange-500 bg-orange-50">
           <Box>
             <AlertTitle>{t('validation.invalidRowsWarning', 'Invalid Rows Will Be Filtered')}</AlertTitle>
             <AlertDescription>
@@ -659,7 +635,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
         </Table>
 
         {tableData.length === 0 && (
-          <Box p={8} textAlign="center">
+          <Box className="p-8 text-center">
             <Text>No data to display.</Text>
           </Box>
         )}

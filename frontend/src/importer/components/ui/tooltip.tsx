@@ -5,7 +5,7 @@ import { cn } from "../../../utils/classes"
 
 const TooltipProvider = TooltipPrimitive.Provider
 
-const Tooltip = TooltipPrimitive.Root
+const TooltipRoot = TooltipPrimitive.Root
 
 const TooltipTrigger = TooltipPrimitive.Trigger
 
@@ -25,4 +25,26 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+// Convenience wrapper that handles the content prop
+interface TooltipProps {
+  content: React.ReactNode
+  children: React.ReactNode
+  delayDuration?: number
+}
+
+const Tooltip = ({ content, children, delayDuration = 200 }: TooltipProps) => {
+  return (
+    <TooltipProvider>
+      <TooltipRoot delayDuration={delayDuration}>
+        <TooltipTrigger asChild>
+          {children}
+        </TooltipTrigger>
+        <TooltipContent>
+          {content}
+        </TooltipContent>
+      </TooltipRoot>
+    </TooltipProvider>
+  )
+}
+
+export { Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, TooltipProvider }

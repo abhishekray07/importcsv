@@ -1,22 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Button } from '../../components/ui/button';
+import { Box, Flex, Text, VStack, HStack } from '../../components/ui/flex';
+import { Switch } from '../../components/ui/switch';
 import {
-  Box,
-  Flex,
-  Text,
-  Switch,
   Select,
-  Button,
-  Badge,
-  Icon,
-  VStack,
-  HStack,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-} from '@chakra-ui/react';
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
+// Using native HTML table elements instead of Chakra UI
 import { PiCheckCircle } from 'react-icons/pi';
 import { useTranslation } from '../../../i18n/useTranslation';
 import { Template } from '../../types';
@@ -81,21 +74,21 @@ export default function ConfigureImport({
   // Auto-map columns based on name similarity
   useEffect(() => {
     const autoMap: ColumnMapping = {};
-    
+
     columnHeaders.forEach((header: string, index: number) => {
       let bestMatch = { column: null as any, score: 0 };
-      
+
       template.columns.forEach((templateCol) => {
         const score = stringSimilarity(
           header.toLowerCase().trim(),
           templateCol.name.toLowerCase().trim()
         );
-        
+
         if (score > bestMatch.score && score > 0.6) {
           bestMatch = { column: templateCol, score };
         }
       });
-      
+
       if (bestMatch.column) {
         autoMap[index] = {
           key: bestMatch.column.key,
@@ -104,26 +97,26 @@ export default function ConfigureImport({
         };
       }
     });
-    
+
     setColumnMapping(autoMap);
   }, [columnHeaders, template.columns]);
 
   // Handle column mapping change
   const handleMappingChange = (templateFieldKey: string, csvColumnIndex: string) => {
     const newMapping = { ...columnMapping };
-    
+
     // Clear previous mapping for this template field
     Object.keys(newMapping).forEach((key) => {
       if (newMapping[parseInt(key)].key === templateFieldKey) {
         delete newMapping[parseInt(key)];
       }
     });
-    
-    // Set new mapping if column selected
-    if (csvColumnIndex !== '') {
+
+    // Set new mapping if column selected (and not "none")
+    if (csvColumnIndex !== '' && csvColumnIndex !== 'none') {
       const colIndex = parseInt(csvColumnIndex);
       const templateField = template.columns.find(col => col.key === templateFieldKey);
-      
+
       if (templateField) {
         newMapping[colIndex] = {
           key: templateFieldKey,
@@ -132,7 +125,7 @@ export default function ConfigureImport({
         };
       }
     }
-    
+
     setColumnMapping(newMapping);
   };
 
@@ -147,7 +140,7 @@ export default function ConfigureImport({
   // Check if all required fields are mapped
   const allRequiredFieldsMapped = useMemo(() => {
     const requiredFields = template.columns.filter((col: any) => col.required);
-    return requiredFields.every((field: any) => 
+    return requiredFields.every((field: any) =>
       Object.values(columnMapping).some(mapping => mapping.key === field.key)
     );
   }, [template.columns, columnMapping]);
@@ -158,146 +151,140 @@ export default function ConfigureImport({
       setError(t('Please map all required fields'));
       return;
     }
-    
+
     setError(null);
     onSuccess(columnMapping, selectedHeaderRow);
   };
 
   return (
     <div className={style.configureImport}>
-      <VStack align="stretch" spacing={6}>
+      <VStack className="gap-6 w-full">
         {/* Title Section */}
         <Box>
-          <Text fontSize="2xl" fontWeight="600" mb={2}>
-            {t('CSV fields mapping')}
-          </Text>
-          <Text fontSize="sm" color="gray.600">
-            {t('Map columns from imported CSV to the default fields required for the payment. Not required columns could be skipped')}
+          <Text className="text-sm text-gray-600">
+            {t('Map columns from imported CSV.')}
           </Text>
         </Box>
 
-        {/* Mapping Table */}
-        <Box 
-          border="1px solid" 
-          borderColor="gray.200" 
-          borderRadius="lg"
-          overflow="hidden"
-          bg="white"
-        >
-          <Table variant="simple" size="md">
-            <Thead bg="gray.50">
-              <Tr>
-                <Th width="35%" py={4}>
-                  <HStack spacing={2}>
-                    <Text fontSize="sm" fontWeight="600" color="gray.700">
-                      {t('Payment Fields')}
-                    </Text>
-                  </HStack>
-                </Th>
-                <Th width="30%" py={4}>
-                  <HStack spacing={2}>
-                    <Text fontSize="sm" fontWeight="600" color="gray.700">
-                      {t('CSV Column')}
-                    </Text>
-                  </HStack>
-                </Th>
-                <Th width="35%" py={4}>
-                  <HStack spacing={2}>
-                    <Text fontSize="sm" fontWeight="600" color="gray.700">
-                      {t('CSV Example Data')}
-                    </Text>
-                  </HStack>
-                </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
+        {/* Mapping table */}
+        <Box className="border border-gray-200 rounded-lg overflow-x-auto bg-white w-full">
+          <table className="w-full border-collapse min-w-[600px]">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 w-[30%]">
+                  <Text className="text-sm font-semibold text-gray-700">
+                    {t('Fields')}
+                  </Text>
+                </th>
+                <th className="text-left px-6 py-3 w-[35%]">
+                  <Text className="text-sm font-semibold text-gray-700">
+                    {t('CSV Column')}
+                  </Text>
+                </th>
+                <th className="text-left px-6 py-3 w-[35%]">
+                  <Text className="text-sm font-semibold text-gray-700">
+                    {t('CSV Example Data')}
+                  </Text>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               {template.columns.map((field: any, index: number) => {
                 const mappedColumn = getMappedColumn(field.key);
                 const isMapped = mappedColumn !== '';
-                
+
                 return (
-                  <Tr key={field.key}>
-                    <Td py={4}>
-                      <HStack spacing={2}>
+                  <tr key={field.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <HStack className="gap-2 items-center">
                         {isMapped && (
-                          <Icon as={PiCheckCircle} color="green.500" boxSize={5} />
+                          <PiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                         )}
                         {!isMapped && field.required && (
-                          <Box 
-                            width={5} 
-                            height={5} 
-                            borderRadius="full" 
-                            border="2px solid" 
-                            borderColor="gray.300"
-                          />
+                          <Box className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0" />
                         )}
                         {!isMapped && !field.required && (
-                          <Box width={5} height={5} />
+                          <Box className="w-5 h-5 flex-shrink-0" />
                         )}
-                        <Text fontSize="sm" fontWeight="500">
+                        <Text className="text-sm font-medium text-gray-900">
                           {field.name}
                           {field.required && (
-                            <Text as="span" color="red.500">*</Text>
+                            <span className="text-red-500 ml-1">*</span>
                           )}
                         </Text>
                       </HStack>
-                    </Td>
-                    <Td py={4}>
-                      <Select
-                        size="sm"
-                        value={mappedColumn}
-                        onChange={(e) => handleMappingChange(field.key, e.target.value)}
-                        placeholder={t('Select column')}
-                        borderColor="gray.300"
-                        _hover={{ borderColor: 'gray.400' }}
-                        bg="white"
-                      >
-                        {columnHeaders.map((header: string, idx: number) => {
-                          const isAlreadyMapped = Object.keys(columnMapping).includes(idx.toString()) &&
-                            columnMapping[idx].key !== field.key;
+                    </td>
+                    <td className="px-6 py-4">
+                      <Select value={mappedColumn} onValueChange={(value) => handleMappingChange(field.key, value)}>
+                        <SelectTrigger className="h-9 w-full max-w-[250px]">
+                          <SelectValue placeholder={t('Select...')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* None option to unmap */}
+                          <SelectItem value="none">
+                            <span className="text-gray-500">— None —</span>
+                          </SelectItem>
                           
-                          return (
-                            <option 
-                              key={idx} 
-                              value={idx}
-                              disabled={isAlreadyMapped}
-                            >
-                              {header}
-                            </option>
-                          );
-                        })}
+                          {/* Divider */}
+                          <div className="h-px bg-gray-200 my-1" />
+                          
+                          {/* Column options */}
+                          {columnHeaders.map((header: string, idx: number) => {
+                            const isAlreadyMapped = Object.keys(columnMapping).includes(idx.toString()) &&
+                              columnMapping[idx].key !== field.key;
+
+                            return (
+                              <SelectItem
+                                key={idx}
+                                value={idx.toString()}
+                                disabled={isAlreadyMapped}
+                              >
+                                {isAlreadyMapped ? (
+                                  <span className="text-gray-400">{header} (mapped)</span>
+                                ) : (
+                                  header
+                                )}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
                       </Select>
-                    </Td>
-                    <Td py={4}>
-                      <Text fontSize="sm" color="gray.600" noOfLines={1}>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Text className="text-sm text-gray-600 truncate max-w-[300px]" title={mappedColumn ? getSampleData(parseInt(mappedColumn)) : ''}>
                         {mappedColumn ? (getSampleData(parseInt(mappedColumn)) || '-') : ''}
                       </Text>
-                    </Td>
-                  </Tr>
+                    </td>
+                  </tr>
                 );
               })}
-            </Tbody>
-          </Table>
+            </tbody>
+          </table>
         </Box>
 
+        {/* Error message */}
+        {error && (
+          <Box className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            <Text className="text-sm text-red-700">{error}</Text>
+          </Box>
+        )}
+
         {/* Action Buttons */}
-        <Flex justify="space-between">
+        <Flex justify="between" className="w-full pt-6 border-t border-gray-200">
           <Button
             variant="outline"
             onClick={onCancel}
-            isDisabled={isSubmitting}
-            size="lg"
-            px={8}
+            disabled={isSubmitting}
+            size="default"
           >
             {t('Back')}
           </Button>
           <Button
-            colorScheme="blue"
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            isDisabled={!allRequiredFieldsMapped}
-            size="lg"
-            px={8}
+            disabled={!allRequiredFieldsMapped}
+            size="default"
+            variant="default"
           >
             {t('Continue')}
           </Button>

@@ -1,6 +1,9 @@
 import { FormEvent, useState, useEffect } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Button, Switch, Flex, Text, Tooltip, Icon, useMediaQuery } from "@chakra-ui/react";
+import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
+import { Flex, Text } from "../../components/ui/flex";
+import { Tooltip } from "../../components/ui/tooltip";
 import { PiInfo } from "react-icons/pi";
 import Errors from "../../components/Errors";
 import Table from "../../components/Table";
@@ -26,7 +29,16 @@ export default function MapColumns({
   }
 
   const { t } = useTranslation();
-  const [isMobile] = useMediaQuery("(max-width: 480px)");
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const headerRowIndex = selectedHeaderRow ? selectedHeaderRow : 0;
   let sampleDataRows = data.rows.slice(headerRowIndex + 1, headerRowIndex + 4);
 
@@ -105,7 +117,7 @@ export default function MapColumns({
             type="button" 
             variant="outline"
             onClick={onCancel} 
-            isDisabled={isSubmitting}
+            disabled={isSubmitting}
           >
             {skipHeaderRowSelection ? t("Cancel") : t("Back")}
           </Button>
@@ -114,7 +126,7 @@ export default function MapColumns({
               <Errors error={error} />
             </div>
           )}
-          <Button colorScheme="primary" isLoading={isSubmitting} type="submit">
+          <Button isLoading={isSubmitting} type="submit">
             {t("Continue")}
           </Button>
         </div>

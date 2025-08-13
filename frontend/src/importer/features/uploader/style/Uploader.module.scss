@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 .modernContent {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 640px;
+  max-width: 560px;
   margin: 0 auto;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  padding: 2rem 1rem;
+  
+  @media (max-width: 640px) {
+    padding: 1.5rem 1rem;
+  }
   
   @media (max-width: 480px) {
-    padding: 0 1rem;
+    padding: 1rem;
   }
 }
 

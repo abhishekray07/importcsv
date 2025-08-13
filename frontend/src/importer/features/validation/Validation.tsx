@@ -1,6 +1,9 @@
 import React, { useState, useMemo, FormEvent } from 'react';
-import { Button, Flex, Text, Box, Switch, Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
-import { PiSparkle } from 'react-icons/pi';
+import { Button } from '../../components/ui/button';
+import { Switch } from '../../components/ui/switch';
+import { Alert, AlertTitle, AlertDescription } from '../../components/ui/alert';
+import { Tooltip } from '../../components/ui/tooltip';
+import { PiSparkle, PiWarning } from 'react-icons/pi';
 import { ValidationProps } from './types';
 import TransformModal from './components/TransformModal';
 import style from './style/Validation.module.scss';
@@ -310,53 +313,49 @@ export default function Validation({
       <div className={style.validationContent}>
 
         {filterInvalidRows && errorTracking.count > 0 && (
-          <Alert status="warning" variant="left-accent" mt={4} mb={4}>
-            <AlertIcon />
-            <Box>
-              <AlertTitle>Invalid Rows Will Be Filtered</AlertTitle>
-              <AlertDescription>
-                {`${errorTracking.count} ${errorTracking.count === 1 ? 'row' : 'rows'} with validation errors will be excluded from the import. You can fix the errors to include these rows.`}
-              </AlertDescription>
-            </Box>
+          <Alert className="mb-4">
+            <PiWarning className="h-4 w-4" />
+            <AlertTitle>Invalid Rows Will Be Filtered</AlertTitle>
+            <AlertDescription>
+              {`${errorTracking.count} ${errorTracking.count === 1 ? 'row' : 'rows'} with validation errors will be excluded from the import. You can fix the errors to include these rows.`}
+            </AlertDescription>
           </Alert>
         )}
 
         <div className={style.toolbar}>
-          <Flex justify="space-between" align="center">
-            <Flex align="center" gap={4}>
-              <Flex align="center">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center">
                 <Switch
                   id="show-errors-only"
-                  size="sm"
-                  isChecked={showOnlyErrors}
-                  onChange={(e) => setShowOnlyErrors(e.target.checked)}
-                  mr={2}
+                  checked={showOnlyErrors}
+                  onCheckedChange={setShowOnlyErrors}
+                  className="mr-2"
                 />
-                <Text fontSize="sm" fontWeight="medium">Show only rows with errors</Text>
-              </Flex>
+                <label htmlFor="show-errors-only" className="text-sm font-medium">Show only rows with errors</label>
+              </div>
               {errors.length > 0 && (
-                <Text fontSize="sm" color="red.500" fontWeight="medium">
+                <span className="text-sm text-red-500 font-medium">
                   {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
-                </Text>
+                </span>
               )}
-            </Flex>
-            <Flex gap={2} align="center">
+            </div>
+            <div className="flex gap-2 items-center">
               {backendUrl && importerKey && (
                 <Button
                   size="sm"
-                  leftIcon={<PiSparkle />}
                   onClick={() => setIsTransformModalOpen(true)}
                   variant="outline"
-                  colorScheme="blue"
                 >
+                  <PiSparkle className="mr-2 h-4 w-4" />
                   Transform with AI
                 </Button>
               )}
-              <Text fontSize="xs" color="gray.500">
+              <span className="text-xs text-gray-500">
                 {visibleRows.length} of {dataRows.length} rows
-              </Text>
-            </Flex>
-          </Flex>
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className={style.spreadsheetContainer}>
@@ -401,7 +400,7 @@ export default function Validation({
                                 tabIndex={0}
                               />
                               {error && (
-                                <Tooltip label={error.message} placement="top" hasArrow>
+                                <Tooltip content={error.message}>
                                   <span className={style.errorIndicator}>
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                       <circle cx="8" cy="8" r="7" fill="#DC2626"/>
@@ -422,36 +421,34 @@ export default function Validation({
             </table>
             {visibleRows.length === 0 && (
               <div className={style.emptyState}>
-                <Text color="gray.500">
+                <span className="text-gray-500">
                   {showOnlyErrors ? 'No rows with errors found' : 'No data to display'}
-                </Text>
+                </span>
               </div>
             )}
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Flex justify="space-between" mt={4}>
+          <div className="flex justify-between items-center w-full pt-6 border-t border-gray-200">
             <Button
               variant="outline"
               onClick={onCancel}
-              isDisabled={isSubmitting}
-              size="lg"
-              px={8}
+              disabled={isSubmitting}
+              size="default"
             >
               Back
             </Button>
             <Button
               type="submit"
-              colorScheme="blue"
               isLoading={isSubmitting}
-              isDisabled={disableOnInvalidRows && errors.length > 0}
-              size="lg"
-              px={8}
+              disabled={disableOnInvalidRows && errors.length > 0}
+              size="default"
+              variant="default"
             >
               Submit
             </Button>
-          </Flex>
+          </div>
         </form>
       </div>
 

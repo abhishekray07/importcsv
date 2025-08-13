@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { Alert } from "@chakra-ui/alert";
-import { Button } from "@chakra-ui/react";
+import { Alert } from "../../components/ui/alert";
+import { Button } from "../../components/ui/button";
 import Table from "../../components/Table";
 import Tooltip from "../../components/Tooltip";
 import { RowSelectionProps } from "./types";
@@ -64,7 +64,7 @@ export default function RowSelection({ data, onSuccess, onCancel, selectedHeader
         {data ? (
           <>
             {hasMultipleExcelSheets ? (
-              <Alert status="info">
+              <Alert className="border-l-4 border-blue-500 bg-blue-50">
                 <PiWarningCircle className={style.warningIcon} />
                 {t(
                   "Only the first sheet (&quot;{{sheet}}&quot;) of the Excel file will be imported. To import multiple sheets, please upload each sheet individually.",
@@ -99,13 +99,12 @@ export default function RowSelection({ data, onSuccess, onCancel, selectedHeader
             type="button" 
             variant="outline" 
             onClick={onCancel} 
-            isDisabled={isLoading}
+            disabled={isLoading}
           >
             {t("Back")}
           </Button>
           <Button 
             type="submit"
-            colorScheme="primary"
             onClick={handleNextClick} 
             isLoading={isLoading}
           >

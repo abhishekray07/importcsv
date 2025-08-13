@@ -4,6 +4,7 @@ import Providers from "../../importer/providers";
 import useThemeStore from "../../importer/stores/theme";
 import { darkenColor, isValidColor } from "../../importer/utils/utils";
 import { CSVImporterProps } from "../../types";
+import "../../index.css";
 import "../../importer/style/index.scss";
 import "./style/csv-importer.css";
 
