@@ -193,7 +193,7 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
   headerRowIndex,
 }) => {
   const { t } = useTranslation();
-  const toast = useToast();
+  const { toast } = useToast();
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [data, updateData] = useImmer(dataRows);
   const [selectedCell, setSelectedCell] = useState<CellPosition | null>(null);
@@ -321,16 +321,12 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
       toast({
         title: 'Copied',
         description: `${cells.length} cells copied to clipboard`,
-        status: 'success',
-        duration: 2000,
       });
     } else if (selectedCell) {
       const value = data[selectedCell.row]?.values?.[selectedCell.col] || '';
       clipboardManager.current.copy([value], { start: selectedCell, end: selectedCell });
       toast({
         title: 'Copied',
-        status: 'success',
-        duration: 2000,
       });
     }
   }, [selection, selectedCell, data, toast]);
@@ -358,8 +354,6 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
       toast({
         title: 'Pasted',
         description: `${edits.length} cells updated`,
-        status: 'success',
-        duration: 2000,
       });
     }
   }, [selectedCell, data, includedColumns, handleBulkEdit, toast]);
@@ -385,8 +379,6 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
 
     toast({
       title: 'Undo',
-      status: 'info',
-      duration: 1000,
     });
   }, [updateData, toast]);
 
@@ -411,8 +403,6 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
 
     toast({
       title: 'Redo',
-      status: 'info',
-      duration: 1000,
     });
   }, [updateData, toast]);
 

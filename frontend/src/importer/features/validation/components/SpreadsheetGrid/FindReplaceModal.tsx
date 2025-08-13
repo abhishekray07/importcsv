@@ -17,11 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../components/ui/select';
-import {
-  Checkbox,
-  FormControl,
-  FormLabel,
-} from '../../../../components/ui/flex'; // Some form components remain for now
+// Form components not needed in this component
 
 interface FindReplaceModalProps {
   isOpen: boolean;
@@ -45,7 +41,7 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
   const [useRegex, setUseRegex] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
   const [matchCount, setMatchCount] = useState(0);
-  const toast = useToast();
+  const { toast } = useToast();
 
   const findMatches = useCallback(() => {
     if (!findText) {
@@ -63,8 +59,7 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
       } catch (e) {
         toast({
           title: 'Invalid regex',
-          status: 'error',
-          duration: 2000,
+          variant: 'destructive',
         });
         return [];
       }
@@ -106,8 +101,6 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
     if (matches.length === 0) {
       toast({
         title: 'No matches found',
-        status: 'warning',
-        duration: 2000,
       });
       return;
     }
@@ -147,8 +140,6 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
       toast({
         title: 'Replace completed',
         description: `${edits.length} cells updated`,
-        status: 'success',
-        duration: 3000,
       });
       onClose();
     }
@@ -159,14 +150,10 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
     if (matches.length === 0) {
       toast({
         title: 'No matches found',
-        status: 'info',
-        duration: 2000,
       });
     } else {
       toast({
         title: `${matches.length} matches found`,
-        status: 'success',
-        duration: 2000,
       });
     }
   }, [findMatches, toast]);
@@ -178,7 +165,7 @@ export const FindReplaceModal: React.FC<FindReplaceModalProps> = ({
           <DialogTitle>Find & Replace</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <VStack spacing={4}>
+          <VStack className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Find</label>
               <Input

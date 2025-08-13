@@ -267,35 +267,35 @@ export const SimpleSpreadsheetGrid: React.FC<SimpleSpreadsheetGridProps> = ({
       )}
 
       <div className="spreadsheet-table-wrapper">
-        <Table variant="simple" size="sm">
-          <Thead>
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 border-b">
             {table.getHeaderGroups().map(headerGroup => (
-              <Tr key={headerGroup.id}>
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <Th key={header.id}>
+                  <th key={header.id} className="px-4 py-2 text-left font-medium">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
-                  </Th>
+                  </th>
                 ))}
-              </Tr>
+              </tr>
             ))}
-          </Thead>
-          <Tbody>
+          </thead>
+          <tbody>
             {table.getRowModel().rows.map(row => (
-              <Tr key={row.id}>
+              <tr key={row.id} className="border-b hover:bg-gray-50">
                 {row.getVisibleCells().map(cell => (
-                  <Td key={cell.id} p={0}>
+                  <td key={cell.id} className="p-0">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
+                  </td>
                 ))}
-              </Tr>
+              </tr>
             ))}
-          </Tbody>
-        </Table>
+          </tbody>
+        </table>
         
         {tableData.length === 0 && (
           <Box className="p-8 text-center">

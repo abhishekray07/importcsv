@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '../../components/ui/button';
 import { Box, Flex, Text, VStack, HStack } from '../../components/ui/flex';
 import { Switch } from '../../components/ui/switch';
@@ -14,6 +14,7 @@ import { PiCheckCircle } from 'react-icons/pi';
 import { useTranslation } from '../../../i18n/useTranslation';
 import { Template } from '../../types';
 import stringSimilarity from '../../utils/stringSimilarity';
+import { getMappingSuggestions } from '../../services/mapping';
 import style from './style/ConfigureImport.module.scss';
 
 interface ConfigureImportProps {
@@ -47,6 +48,7 @@ export default function ConfigureImport({
   const selectedHeaderRow = 0; // Always use first row as headers
   const [columnMapping, setColumnMapping] = useState<ColumnMapping>({});
   const [error, setError] = useState<string | null>(null);
+  const llmEnhancementCalled = useRef(false);
 
   // Get preview data (first 5 rows)
   const previewRows = useMemo(() => {
@@ -60,6 +62,18 @@ export default function ConfigureImport({
     }
     return [];
   }, [data.rows]);
+
+  // Prepare uploadColumns for AI mapping
+  const uploadColumns = useMemo(() => {
+    return columnHeaders.map((header: string, index: number) => ({
+      index: index,
+      name: header,
+      sample_data: data.rows
+        .slice(selectedHeaderRow + 1, selectedHeaderRow + 4)
+        .map((row: any) => row.values[index])
+        .filter((val: any) => val)
+    }));
+  }, [columnHeaders, data.rows, selectedHeaderRow]);
 
   // Get sample data for each column (skip header row)
   const getSampleData = (columnIndex: number) => {
@@ -100,6 +114,80 @@ export default function ConfigureImport({
 
     setColumnMapping(autoMap);
   }, [columnHeaders, template.columns]);
+
+  // Enhance mappings with LLM suggestions after initial load
+  useEffect(() => {
+    const enhanceWithLLM = async () => {
+      // Skip if already called
+      if (llmEnhancementCalled.current) {
+        return;
+      }
+      
+      // Only run if we have columns, backend URL, and importer key
+      if (!uploadColumns.length || !template.columns.length || !backendUrl || !importerKey) {
+        return;
+      }
+
+      // Mark as called to prevent duplicate requests
+      llmEnhancementCalled.current = true;
+
+      try {
+        // Get LLM-enhanced mapping suggestions
+        const suggestions = await getMappingSuggestions(
+          uploadColumns,
+          template.columns,
+          backendUrl,
+          importerKey
+        );
+
+        if (suggestions.length > 0) {
+          // Apply high-confidence suggestions that don't override existing good matches
+          setColumnMapping((prevMapping) => {
+            const newMapping = { ...prevMapping };
+            const usedTemplateKeys = new Set(
+              Object.values(prevMapping)
+                .filter(v => v.key)
+                .map(v => v.key)
+            );
+
+            // Sort by confidence (highest first)
+            const sortedSuggestions = [...suggestions].sort((a, b) => b.confidence - a.confidence);
+
+            for (const suggestion of sortedSuggestions) {
+              // Only apply if:
+              // 1. Good confidence (>0.7)
+              // 2. No existing mapping or low-confidence string match
+              // 3. Template key not already used
+              const currentMapping = prevMapping[suggestion.uploadIndex];
+              const hasWeakMatch = currentMapping?.key && !currentMapping?.include;
+              
+              if (
+                suggestion.confidence > 0.7 &&
+                (!currentMapping?.key || hasWeakMatch) &&
+                !usedTemplateKeys.has(suggestion.templateKey)
+              ) {
+                const templateCol = template.columns.find(col => col.key === suggestion.templateKey);
+                if (templateCol) {
+                  newMapping[suggestion.uploadIndex] = {
+                    key: suggestion.templateKey,
+                    name: templateCol.name,
+                    include: true,
+                  };
+                  usedTemplateKeys.add(suggestion.templateKey);
+                }
+              }
+            }
+
+            return newMapping;
+          });
+        }
+      } catch (error) {
+        // Silently fail - fallback to string similarity is already applied
+      }
+    };
+
+    enhanceWithLLM();
+  }, [uploadColumns, template.columns, backendUrl, importerKey]);
 
   // Handle column mapping change
   const handleMappingChange = (templateFieldKey: string, csvColumnIndex: string) => {
