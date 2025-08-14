@@ -92,6 +92,13 @@ class BamlSyncClient:
             "resume": resume,
         })
         return typing.cast(types.Resume, result.cast_to(types, types, stream_types, False, __runtime__))
+    def FixValidationErrors(self, user_prompt: str,validation_errors: typing.List["types.ValidationError"],row_data: typing.List["types.RowData"],validation_rules: typing.Dict[str, "types.ValidationRule"],
+        baml_options: BamlCallOptions = {},
+    ) -> types.TransformationResult:
+        result = self.__options.merge_options(baml_options).call_function_sync(function_name="FixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors": validation_errors,"row_data": row_data,"validation_rules": validation_rules,
+        })
+        return typing.cast(types.TransformationResult, result.cast_to(types, types, stream_types, False, __runtime__))
     def IdentifyRelevantColumns(self, prompt: str,available_columns: typing.List[str],
         baml_options: BamlCallOptions = {},
     ) -> typing.List[str]:
@@ -99,6 +106,27 @@ class BamlSyncClient:
             "prompt": prompt,"available_columns": available_columns,
         })
         return typing.cast(typing.List[str], result.cast_to(types, types, stream_types, False, __runtime__))
+    def TestFixValidationErrors(self, user_prompt: str,validation_errors_json: str,row_data_json: str,validation_rules_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).call_function_sync(function_name="TestFixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors_json": validation_errors_json,"row_data_json": row_data_json,"validation_rules_json": validation_rules_json,
+        })
+        return typing.cast(str, result.cast_to(types, types, stream_types, False, __runtime__))
+    def TestTransformDataGeneral(self, user_prompt: str,row_data_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).call_function_sync(function_name="TestTransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data_json": row_data_json,
+        })
+        return typing.cast(str, result.cast_to(types, types, stream_types, False, __runtime__))
+    def TransformDataGeneral(self, user_prompt: str,row_data: typing.List["types.RowData"],
+        baml_options: BamlCallOptions = {},
+    ) -> types.TransformationResult:
+        result = self.__options.merge_options(baml_options).call_function_sync(function_name="TransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data": row_data,
+        })
+        return typing.cast(types.TransformationResult, result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -120,6 +148,18 @@ class BamlStreamClient:
           lambda x: typing.cast(types.Resume, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
+    def FixValidationErrors(self, user_prompt: str,validation_errors: typing.List["types.ValidationError"],row_data: typing.List["types.RowData"],validation_rules: typing.Dict[str, "types.ValidationRule"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[stream_types.TransformationResult, types.TransformationResult]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="FixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors": validation_errors,"row_data": row_data,"validation_rules": validation_rules,
+        })
+        return baml_py.BamlSyncStream[stream_types.TransformationResult, types.TransformationResult](
+          result,
+          lambda x: typing.cast(stream_types.TransformationResult, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.TransformationResult, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     def IdentifyRelevantColumns(self, prompt: str,available_columns: typing.List[str],
         baml_options: BamlCallOptions = {},
     ) -> baml_py.BamlSyncStream[typing.List[str], typing.List[str]]:
@@ -130,6 +170,42 @@ class BamlStreamClient:
           result,
           lambda x: typing.cast(typing.List[str], x.cast_to(types, types, stream_types, True, __runtime__)),
           lambda x: typing.cast(typing.List[str], x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def TestFixValidationErrors(self, user_prompt: str,validation_errors_json: str,row_data_json: str,validation_rules_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[str, str]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="TestFixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors_json": validation_errors_json,"row_data_json": row_data_json,"validation_rules_json": validation_rules_json,
+        })
+        return baml_py.BamlSyncStream[str, str](
+          result,
+          lambda x: typing.cast(str, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(str, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def TestTransformDataGeneral(self, user_prompt: str,row_data_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[str, str]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="TestTransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data_json": row_data_json,
+        })
+        return baml_py.BamlSyncStream[str, str](
+          result,
+          lambda x: typing.cast(str, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(str, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def TransformDataGeneral(self, user_prompt: str,row_data: typing.List["types.RowData"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[stream_types.TransformationResult, types.TransformationResult]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="TransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data": row_data,
+        })
+        return baml_py.BamlSyncStream[stream_types.TransformationResult, types.TransformationResult](
+          result,
+          lambda x: typing.cast(stream_types.TransformationResult, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.TransformationResult, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
     
@@ -147,11 +223,39 @@ class BamlHttpRequestClient:
             "resume": resume,
         }, mode="request")
         return result
+    def FixValidationErrors(self, user_prompt: str,validation_errors: typing.List["types.ValidationError"],row_data: typing.List["types.RowData"],validation_rules: typing.Dict[str, "types.ValidationRule"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="FixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors": validation_errors,"row_data": row_data,"validation_rules": validation_rules,
+        }, mode="request")
+        return result
     def IdentifyRelevantColumns(self, prompt: str,available_columns: typing.List[str],
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="IdentifyRelevantColumns", args={
             "prompt": prompt,"available_columns": available_columns,
+        }, mode="request")
+        return result
+    def TestFixValidationErrors(self, user_prompt: str,validation_errors_json: str,row_data_json: str,validation_rules_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TestFixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors_json": validation_errors_json,"row_data_json": row_data_json,"validation_rules_json": validation_rules_json,
+        }, mode="request")
+        return result
+    def TestTransformDataGeneral(self, user_prompt: str,row_data_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TestTransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data_json": row_data_json,
+        }, mode="request")
+        return result
+    def TransformDataGeneral(self, user_prompt: str,row_data: typing.List["types.RowData"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data": row_data,
         }, mode="request")
         return result
     
@@ -169,11 +273,39 @@ class BamlHttpStreamRequestClient:
             "resume": resume,
         }, mode="stream")
         return result
+    def FixValidationErrors(self, user_prompt: str,validation_errors: typing.List["types.ValidationError"],row_data: typing.List["types.RowData"],validation_rules: typing.Dict[str, "types.ValidationRule"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="FixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors": validation_errors,"row_data": row_data,"validation_rules": validation_rules,
+        }, mode="stream")
+        return result
     def IdentifyRelevantColumns(self, prompt: str,available_columns: typing.List[str],
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="IdentifyRelevantColumns", args={
             "prompt": prompt,"available_columns": available_columns,
+        }, mode="stream")
+        return result
+    def TestFixValidationErrors(self, user_prompt: str,validation_errors_json: str,row_data_json: str,validation_rules_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TestFixValidationErrors", args={
+            "user_prompt": user_prompt,"validation_errors_json": validation_errors_json,"row_data_json": row_data_json,"validation_rules_json": validation_rules_json,
+        }, mode="stream")
+        return result
+    def TestTransformDataGeneral(self, user_prompt: str,row_data_json: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TestTransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data_json": row_data_json,
+        }, mode="stream")
+        return result
+    def TransformDataGeneral(self, user_prompt: str,row_data: typing.List["types.RowData"],
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="TransformDataGeneral", args={
+            "user_prompt": user_prompt,"row_data": row_data,
         }, mode="stream")
         return result
     

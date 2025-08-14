@@ -28,11 +28,35 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractResume", llm_response=llm_response, mode="request")
         return typing.cast(types.Resume, result)
 
+    def FixValidationErrors(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.TransformationResult:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="FixValidationErrors", llm_response=llm_response, mode="request")
+        return typing.cast(types.TransformationResult, result)
+
     def IdentifyRelevantColumns(
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> typing.List[str]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="IdentifyRelevantColumns", llm_response=llm_response, mode="request")
         return typing.cast(typing.List[str], result)
+
+    def TestFixValidationErrors(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TestFixValidationErrors", llm_response=llm_response, mode="request")
+        return typing.cast(str, result)
+
+    def TestTransformDataGeneral(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TestTransformDataGeneral", llm_response=llm_response, mode="request")
+        return typing.cast(str, result)
+
+    def TransformDataGeneral(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.TransformationResult:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TransformDataGeneral", llm_response=llm_response, mode="request")
+        return typing.cast(types.TransformationResult, result)
 
     
 
@@ -48,10 +72,34 @@ class LlmStreamParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractResume", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.Resume, result)
 
+    def FixValidationErrors(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.TransformationResult:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="FixValidationErrors", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.TransformationResult, result)
+
     def IdentifyRelevantColumns(
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> typing.List[str]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="IdentifyRelevantColumns", llm_response=llm_response, mode="stream")
         return typing.cast(typing.List[str], result)
+
+    def TestFixValidationErrors(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TestFixValidationErrors", llm_response=llm_response, mode="stream")
+        return typing.cast(str, result)
+
+    def TestTransformDataGeneral(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TestTransformDataGeneral", llm_response=llm_response, mode="stream")
+        return typing.cast(str, result)
+
+    def TransformDataGeneral(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.TransformationResult:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="TransformDataGeneral", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.TransformationResult, result)
 
     

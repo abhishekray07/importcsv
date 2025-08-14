@@ -19,5 +19,20 @@ type_map = {
     "types.Resume": types.Resume,
     "stream_types.Resume": stream_types.Resume,
 
+    "types.RowData": types.RowData,
+    "stream_types.RowData": stream_types.RowData,
+
+    "types.Transformation": types.Transformation,
+    "stream_types.Transformation": stream_types.Transformation,
+
+    "types.TransformationResult": types.TransformationResult,
+    "stream_types.TransformationResult": stream_types.TransformationResult,
+
+    "types.ValidationError": types.ValidationError,
+    "stream_types.ValidationError": stream_types.ValidationError,
+
+    "types.ValidationRule": types.ValidationRule,
+    "stream_types.ValidationRule": stream_types.ValidationRule,
+
 
 }

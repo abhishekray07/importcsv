@@ -41,7 +41,7 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (1)
+# Generated classes (6)
 # #########################################################################
 
 class Resume(BaseModel):
@@ -49,6 +49,34 @@ class Resume(BaseModel):
     email: str
     experience: typing.List[str]
     skills: typing.List[str]
+
+class RowData(BaseModel):
+    row_index: int
+    data: typing.Dict[str, str]
+
+class Transformation(BaseModel):
+    row_index: int
+    column: str
+    old_value: str
+    new_value: str
+    confidence: float
+
+class TransformationResult(BaseModel):
+    transformations: typing.List["Transformation"]
+
+class ValidationError(BaseModel):
+    row_index: int
+    column_key: str
+    value: str
+    error_message: str
+
+class ValidationRule(BaseModel):
+    type: str
+    rule: str
+    pattern: typing.Optional[str] = None
+    valid_examples: typing.List[str]
+    invalid_examples: typing.List[str]
+    common_fixes: typing.Dict[str, str]
 
 # #########################################################################
 # Generated type aliases (0)

@@ -23,7 +23,7 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (1)
+# Generated classes (6)
 # #########################################################################
 
 class Resume(BaseModel):
@@ -31,6 +31,34 @@ class Resume(BaseModel):
     email: typing.Optional[str] = None
     experience: typing.List[str]
     skills: typing.List[str]
+
+class RowData(BaseModel):
+    row_index: typing.Optional[int] = None
+    data: typing.Dict[str, str]
+
+class Transformation(BaseModel):
+    row_index: typing.Optional[int] = None
+    column: typing.Optional[str] = None
+    old_value: typing.Optional[str] = None
+    new_value: typing.Optional[str] = None
+    confidence: typing.Optional[float] = None
+
+class TransformationResult(BaseModel):
+    transformations: typing.List["Transformation"]
+
+class ValidationError(BaseModel):
+    row_index: typing.Optional[int] = None
+    column_key: typing.Optional[str] = None
+    value: typing.Optional[str] = None
+    error_message: typing.Optional[str] = None
+
+class ValidationRule(BaseModel):
+    type: typing.Optional[str] = None
+    rule: typing.Optional[str] = None
+    pattern: typing.Optional[str] = None
+    valid_examples: typing.List[str]
+    invalid_examples: typing.List[str]
+    common_fixes: typing.Dict[str, str]
 
 # #########################################################################
 # Generated type aliases (0)
