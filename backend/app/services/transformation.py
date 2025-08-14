@@ -7,6 +7,7 @@ import logging
 import os
 
 import litellm
+from baml_client.async_client import b
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ async def generate_transformations(
     try:
         # Step 1: Identify relevant columns if not provided
         if not target_columns:
-            target_columns = await _identify_relevant_columns(prompt, column_mapping, api_key)
+            target_columns = await _identify_relevant_columns(prompt, column_mapping)
 
         # Step 2: Determine which rows to process
         if validation_errors:
@@ -189,9 +190,9 @@ async def generate_transformations(
 
 
 async def _identify_relevant_columns(
-    prompt: str, column_mapping: dict[str, str], api_key: str
+    prompt: str, column_mapping: dict[str, str]
 ) -> list[str]:
-    """Identify which columns are relevant for the transformation."""
+    """Identify which columns are relevant for the transformation using BAML."""
     # Extract column names
     available_columns = []
     for col_val in list(column_mapping.values()):
@@ -202,35 +203,19 @@ async def _identify_relevant_columns(
         if col_name:
             available_columns.append(col_name)
 
-    # Ask LLM which columns are relevant
-    prompt_text = f"""
-Given this user request: "{prompt}"
-And these available columns: {json.dumps(available_columns)}
-
-Which columns are relevant for this transformation?
-Return ONLY a JSON array of column names, e.g., ["email"] or ["phone", "mobile"]
-"""
-
     try:
-        response = await litellm.acompletion(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Return only a JSON array of column names."},
-                {"role": "user", "content": prompt_text}
-            ],
-            api_key=api_key,
+        # Use BAML to identify relevant columns
+        selected_columns = await b.IdentifyRelevantColumns(
+            prompt=prompt,
+            available_columns=available_columns
         )
-
-        content = response.choices[0].message.content.strip()
-        # Parse JSON array
-        if content.startswith("[") and content.endswith("]"):
-            selected = json.loads(content)
-            return [col for col in selected if col in available_columns]
+        
+        # Ensure selected columns are actually in available columns
+        return [col for col in selected_columns if col in available_columns]
     except Exception as e:
         logger.error(f"Column identification failed: {e}")
-
-    # Fallback: return all columns
-    return available_columns
+        # Fallback: return all columns
+        return available_columns
 
 
 def _get_column_indices(
