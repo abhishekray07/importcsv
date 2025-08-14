@@ -108,6 +108,30 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
+          /* CSS Variables for Tailwind colors */
+          :root {
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96.1%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.5rem;
+          }
+          
           /* Reset styles to ensure clean slate */
           * {
             margin: 0;
@@ -118,7 +142,7 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
           html, body {
             width: 100%;
             height: 100%;
-            overflow: auto;
+            overflow: visible;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -130,11 +154,11 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
             min-height: 100%;
           }
           
-          /* Ensure content can expand horizontally */
+          /* Ensure content can expand horizontally without iframe scrolling */
           #mountHere {
             width: 100%;
             min-width: 0;
-            overflow-x: auto;
+            overflow: visible;
           }
         </style>
       </head>

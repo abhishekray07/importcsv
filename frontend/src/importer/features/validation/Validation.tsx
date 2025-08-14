@@ -31,7 +31,7 @@ export default function Validation({
   // Data extraction
   const headerRowIndex = selectedHeaderRow || 0;
   const headerRow = fileData.rows[headerRowIndex];
-  
+
   // Make dataRows a state variable so changes persist
   const [dataRows, setDataRows] = useState(() => fileData.rows.slice(headerRowIndex + 1));
 
@@ -225,16 +225,17 @@ export default function Validation({
     shouldValidateRef.current = false;
   }, [dataRows, columnMapping, template, headerRowIndex]);
 
-  // Trigger validation
+  // Trigger validation when data changes
   React.useEffect(() => {
+    shouldValidateRef.current = true;
     validateData();
-  }, [validateData]);
+  }, [dataRows, validateData]);
 
   // Cell editing
   const handleCellEdit = React.useCallback((rowIdx: number, colIdx: number, value: string) => {
     // Only update if value actually changed
     if (dataRows[rowIdx]?.values[colIdx] === value) return;
-    
+
     // Create a copy of dataRows and update the specific value
     setDataRows(prevRows => {
       const updatedRows = [...prevRows];
@@ -246,9 +247,11 @@ export default function Validation({
         };
         updatedRows[rowIdx].values[colIdx] = value;
       }
+      // Reset validation flag to trigger revalidation
+      shouldValidateRef.current = true;
       return updatedRows;
     });
-    
+
     shouldValidateRef.current = true;
   }, [dataRows]);
 
@@ -358,28 +361,28 @@ export default function Validation({
           </div>
         </div>
 
-        <div className={style.spreadsheetContainer}>
-          <div className={style.spreadsheetWrapper}>
-            <table className={style.spreadsheetTable}>
-              <thead className={style.spreadsheetHeader}>
-                <tr>
-                  <th className={style.rowNumberHeader}>#</th>
-                  {headers.map((header, idx) => (
-                    <th key={idx} className={style.columnHeader}>
-                      <div className={style.headerContent}>{header}</div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className={style.spreadsheetBody}>
+        {/* Use exact same structure as Configure but with wider table for validation data */}
+        <div className="border border-gray-200 rounded-lg overflow-x-auto bg-white w-full">
+          <table className="w-full border-collapse min-w-[900px]">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700">#</th>
+                {headers.map((header, idx) => (
+                  <th key={idx} className="text-left px-6 py-3 text-sm font-semibold text-gray-700">
+                    <div>{header}</div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
                 {visibleRows.map((row, rowIdx) => {
                   const actualRowIdx = dataRows.indexOf(row);
                   const displayRowIndex = actualRowIdx + headerRowIndex + 1;
                   const rowHasError = errors.some(err => err.rowIndex === displayRowIndex);
 
                   return (
-                    <tr key={rowIdx} className={`${style.dataRow} ${rowHasError ? style.errorRow : ''}`}>
-                      <td className={style.rowNumber}>
+                    <tr key={rowIdx} className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${rowHasError ? 'bg-red-50 hover:bg-red-100' : ''}`}>
+                      <td className="px-6 py-3 text-sm text-gray-700">
                         <span>{displayRowIndex + 1}</span>
                       </td>
                       {includedColumns.map((colIdx, idx) => {
@@ -390,18 +393,18 @@ export default function Validation({
                         );
 
                         return (
-                          <td key={idx} className={`${style.dataCell} ${error ? style.errorCell : ''}`}>
-                            <div className={style.cellContent}>
+                          <td key={idx} className="px-6 py-3">
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={String(value || '')}
                                 onChange={(e) => handleCellEdit(actualRowIdx, colIdx, e.target.value)}
-                                className={style.cellInput}
                                 tabIndex={0}
+                                className={`w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
                               />
                               {error && (
                                 <Tooltip content={error.message}>
-                                  <span className={style.errorIndicator}>
+                                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                       <circle cx="8" cy="8" r="7" fill="#DC2626"/>
                                       <path d="M8 4.5V9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
@@ -418,15 +421,14 @@ export default function Validation({
                   );
                 })}
               </tbody>
-            </table>
-            {visibleRows.length === 0 && (
-              <div className={style.emptyState}>
-                <span className="text-gray-500">
-                  {showOnlyErrors ? 'No rows with errors found' : 'No data to display'}
-                </span>
-              </div>
-            )}
-          </div>
+          </table>
+          {visibleRows.length === 0 && (
+            <div className="p-8 text-center">
+              <span className="text-gray-500">
+                {showOnlyErrors ? 'No rows with errors found' : 'No data to display'}
+              </span>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -475,29 +477,29 @@ export default function Validation({
             console.log('=== APPLYING TRANSFORMATIONS ===');
             console.log('Total changes received:', changes.length);
             console.log('Current dataRows length:', dataRows.length);
-            
+
             // Create a copy of dataRows and apply all changes
             const updatedRows = [...dataRows];
             let appliedCount = 0;
             let skippedCount = 0;
-            
+
             changes.forEach((change) => {
               const { rowIndex, columnIndex, newValue } = change;
-              
+
               // Skip if columnIndex is undefined
               if (columnIndex === undefined) {
                 console.warn(`Skipping change for row ${rowIndex}: columnIndex is undefined`);
                 skippedCount++;
                 return;
               }
-              
+
               // Validate row index
               if (rowIndex < 0 || rowIndex >= updatedRows.length) {
                 console.warn(`Skipping change: rowIndex ${rowIndex} out of bounds (dataRows has ${updatedRows.length} rows)`);
                 skippedCount++;
                 return;
               }
-              
+
               // Apply the change
               if (updatedRows[rowIndex] && updatedRows[rowIndex].values) {
                 // Deep copy the row to avoid mutation issues
@@ -512,11 +514,11 @@ export default function Validation({
                 console.log(`Applied change to row ${rowIndex}, column ${columnIndex}: ${newValue}`);
               }
             });
-            
+
             console.log(`=== TRANSFORMATION SUMMARY ===`);
             console.log(`Applied: ${appliedCount} changes`);
             console.log(`Skipped: ${skippedCount} changes`);
-            
+
             // Update the state with all changes at once
             setDataRows(updatedRows);
             shouldValidateRef.current = true;

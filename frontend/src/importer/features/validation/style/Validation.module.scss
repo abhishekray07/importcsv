@@ -1,5 +1,6 @@
 // Modern Spreadsheet-like Validation Styles
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import '../../shared/BaseContainer.module.scss';
 
 // Variables
 $border-color: #e5e7eb;
@@ -13,45 +14,37 @@ $text-secondary: #6b7280;
 $row-number-bg: #f9fafb;
 $focus-color: #3b82f6;
 
-// Base container
+// Base container - simple like Configure, no flex
 .validationContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  overflow: hidden; // Prevent children from expanding parent
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+  
+  @media (max-width: 640px) {
+    padding: 0.75rem;
+  }
 }
 
 .header {
-  padding: 1rem;
-  border-bottom: 1px solid $border-color;
-  
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 0 0 0.5rem 0;
-  }
-  
-  p {
-    font-size: 0.875rem;
-    color: $text-secondary;
-    margin: 0;
-  }
+  @extend .headerSection;
 }
 
 .validationContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  // Don't extend scrollableContent - it has flex that causes expansion
   padding: 1rem;
-  overflow: hidden;
-  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
 }
 
-// Toolbar
+// Toolbar - use direct styles
 .toolbar {
   padding: 0.75rem 1rem;
   background: white;
@@ -61,28 +54,28 @@ $focus-color: #3b82f6;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-// Spreadsheet Container
+// Spreadsheet Container - simple direct styles like Configure
 .spreadsheetContainer {
-  flex: 1;
-  overflow: hidden;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  // Visual styles
   background: white;
   border: 1px solid $border-color;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  min-width: 0;
 }
 
 .spreadsheetWrapper {
-  height: 100%;
-  width: 100%;
-  overflow: auto;
   position: relative;
 }
 
 // Spreadsheet Table
 .spreadsheetTable {
-  width: auto;
-  min-width: fit-content;
+  width: max-content;
+  min-width: 800px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
