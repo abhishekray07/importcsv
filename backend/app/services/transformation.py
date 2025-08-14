@@ -18,11 +18,14 @@ litellm.set_verbose = False
 MIN_CONFIDENCE_THRESHOLD = 0.7
 
 # Validation rule definitions to help LLM understand what makes data valid
+# Regex patterns match the frontend validation logic for consistency
 VALIDATION_RULES = {
     "email must be a valid email address": {
         "type": "email",
         "rule": "Email must contain @ symbol, domain, and TLD (.com, .org, etc.)",
         "pattern": "username@domain.tld",
+        "regex": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",  # Same as frontend validation
+        "regex_description": "Format: <non-whitespace>@<non-whitespace>.<non-whitespace>",
         "examples": {
             "valid": ["user@example.com", "john.doe@company.org", "info@website.co.uk"],
             "invalid": ["user[at]example.com", "user@example", "userexample.com",
@@ -39,6 +42,9 @@ VALIDATION_RULES = {
     "must be a number": {
         "type": "number",
         "rule": "Value must be a valid number (integer or decimal)",
+        "pattern": "numeric",
+        "regex": "^-?\\d+(\\.\\d+)?$",  # Matches integers and decimals
+        "regex_description": "Format: optional minus sign, digits, optional decimal point and digits",
         "examples": {
             "valid": ["123", "45.67", "-100", "0.5"],
             "invalid": ["abc", "12.34.56", "1,234", "five"]
@@ -52,6 +58,9 @@ VALIDATION_RULES = {
     "must be a valid date": {
         "type": "date",
         "rule": "Date must be in a recognized format like YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY",
+        "pattern": "YYYY-MM-DD or MM/DD/YYYY or DD/MM/YYYY",
+        "regex": None,  # Date validation is complex, handled by Date() constructor
+        "regex_description": "Valid date formats: ISO (YYYY-MM-DD), US (MM/DD/YYYY), EU (DD/MM/YYYY), or parseable date strings",
         "examples": {
             "valid": ["2024-01-15", "01/15/2024", "15/01/2024", "Jan 15, 2024"],
             "invalid": ["1234", "2024", "invalid-date", "32/13/2024"]
