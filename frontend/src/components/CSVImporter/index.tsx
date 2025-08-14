@@ -16,7 +16,7 @@ const CSVImporter = forwardRef((importerProps: CSVImporterProps, forwardRef?: an
     modalOnCloseTriggered = () => null,
     modalCloseOnOutsideClick,
     darkMode = false,
-    primaryColor = "#7a5ef8",
+    primaryColor = "#2563eb",
     className,
     onComplete,
     customStyles,
