@@ -1,4 +1,4 @@
-import React, { useState, useMemo, FormEvent } from 'react';
+import React, { useState, useMemo, FormEvent, useRef, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { Alert, AlertTitle, AlertDescription } from '../../components/ui/alert';
@@ -27,6 +27,9 @@ export default function Validation({
   const [errors, setErrors] = useState<Array<{rowIndex: number, columnIndex: number, message: string}>>([]);
   const [filterMode, setFilterMode] = useState<'all' | 'valid' | 'error'>('all');
   const [isTransformModalOpen, setIsTransformModalOpen] = useState(false);
+  
+  // Ref for scrollable section to reset scroll position
+  const scrollableSectionRef = useRef<HTMLDivElement>(null);
 
   // Data extraction
   const headerRowIndex = selectedHeaderRow || 0;
@@ -49,6 +52,13 @@ export default function Validation({
 
   // Validation tracking
   const shouldValidateRef = React.useRef(true);
+
+  // Reset scroll position when component mounts
+  useEffect(() => {
+    if (scrollableSectionRef.current) {
+      scrollableSectionRef.current.scrollTop = 0;
+    }
+  }, []); // Empty dependency array ensures this runs only on mount
 
   // Validate column mappings
   React.useEffect(() => {
@@ -322,14 +332,13 @@ export default function Validation({
   };
 
   return (
-    <div className={style.validationContainer}>
+    <form onSubmit={handleSubmit} className={style.validationContainer}>
       <div className={style.header}>
         <h2>Validate Data</h2>
         <p>Review and correct any errors in your data before importing.</p>
       </div>
 
-      <div className={style.validationContent}>
-
+      <div className={style.toolbarSection}>
         {filterInvalidRows && errorTracking.count > 0 && (
           <Alert className="mb-4">
             <PiWarning className="h-4 w-4" />
@@ -344,18 +353,21 @@ export default function Validation({
           <div className="flex justify-between items-center">
             <div className={style.tabFilter}>
               <button
+                type="button"
                 className={`${style.tab} ${filterMode === 'all' ? style.active : ''}`}
                 onClick={() => setFilterMode('all')}
               >
                 All <span className={style.count}>{dataRows.length}</span>
               </button>
               <button
+                type="button"
                 className={`${style.tab} ${filterMode === 'valid' ? style.active : ''}`}
                 onClick={() => setFilterMode('valid')}
               >
                 Valid <span className={style.count}>{validCount}</span>
               </button>
               <button
+                type="button"
                 className={`${style.tab} ${style.errorTab} ${filterMode === 'error' ? style.active : ''}`}
                 onClick={() => setFilterMode('error')}
               >
@@ -366,6 +378,7 @@ export default function Validation({
               {backendUrl && importerKey && errorCount > 0 && (
                 <Tooltip content="Use AI to automatically fix validation errors">
                   <Button
+                    type="button"
                     size="sm"
                     onClick={() => setIsTransformModalOpen(true)}
                     variant="default"
@@ -379,100 +392,100 @@ export default function Validation({
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Use exact same structure as Configure but with wider table for validation data */}
-        <div className="border border-gray-200 rounded-lg overflow-x-auto bg-white w-full">
-          <table className="w-full border-collapse min-w-[900px]">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700">#</th>
-                {headers.map((header, idx) => (
-                  <th key={idx} className="text-left px-6 py-3 text-sm font-semibold text-gray-700">
-                    <div>{header}</div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-                {visibleRows.map((row, rowIdx) => {
-                  const actualRowIdx = dataRows.indexOf(row);
-                  const displayRowIndex = actualRowIdx + headerRowIndex + 1;
-                  const rowHasError = errors.some(err => err.rowIndex === displayRowIndex);
+      <div className={style.scrollableSection} ref={scrollableSectionRef}>
+        <div className={style.tableScrollContainer}>
+            <table className="w-full border-collapse min-w-[900px]">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700">#</th>
+                  {headers.map((header, idx) => (
+                    <th key={idx} className="text-left px-6 py-3 text-sm font-semibold text-gray-700">
+                      <div>{header}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                  {visibleRows.map((row, rowIdx) => {
+                    const actualRowIdx = dataRows.indexOf(row);
+                    const displayRowIndex = actualRowIdx + headerRowIndex + 1;
+                    const rowHasError = errors.some(err => err.rowIndex === displayRowIndex);
 
-                  return (
-                    <tr key={rowIdx} className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${rowHasError ? 'bg-red-50 hover:bg-red-100' : ''}`}>
-                      <td className="px-6 py-3 text-sm text-gray-700">
-                        <span>{displayRowIndex + 1}</span>
-                      </td>
-                      {includedColumns.map((colIdx, idx) => {
-                        const value = row.values[colIdx];
+                    return (
+                      <tr key={rowIdx} className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${rowHasError ? 'bg-red-50 hover:bg-red-100' : ''}`}>
+                        <td className="px-6 py-3 text-sm text-gray-700">
+                          <span>{displayRowIndex + 1}</span>
+                        </td>
+                        {includedColumns.map((colIdx, idx) => {
+                          const value = row.values[colIdx];
 
-                        const error = errors.find(
-                          err => err.rowIndex === displayRowIndex && err.columnIndex === colIdx
-                        );
+                          const error = errors.find(
+                            err => err.rowIndex === displayRowIndex && err.columnIndex === colIdx
+                          );
 
-                        return (
-                          <td key={idx} className="px-6 py-3">
-                            <div className="relative">
-                              <input
-                                type="text"
-                                value={String(value || '')}
-                                onChange={(e) => handleCellEdit(actualRowIdx, colIdx, e.target.value)}
-                                tabIndex={0}
-                                className={`w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
-                              />
-                              {error && (
-                                <Tooltip content={error.message}>
-                                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                      <circle cx="8" cy="8" r="7" fill="#DC2626"/>
-                                      <path d="M8 4.5V9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                                      <circle cx="8" cy="11.5" r="0.75" fill="white"/>
-                                    </svg>
-                                  </span>
-                                </Tooltip>
-                              )}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-          </table>
-          {visibleRows.length === 0 && (
-            <div className="p-8 text-center">
-              <span className="text-gray-500">
-                {filterMode === 'error' ? 'No rows with errors found' : 
-                 filterMode === 'valid' ? 'No valid rows found' : 
-                 'No data to display'}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="flex justify-between items-center w-full pt-6 border-t border-gray-200">
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-              size="default"
-            >
-              Back
-            </Button>
-            <Button
-              type="submit"
-              isLoading={isSubmitting}
-              disabled={disableOnInvalidRows && errors.length > 0}
-              size="default"
-              variant="default"
-            >
-              Submit
-            </Button>
+                          return (
+                            <td key={idx} className="px-6 py-3">
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={String(value || '')}
+                                  onChange={(e) => handleCellEdit(actualRowIdx, colIdx, e.target.value)}
+                                  tabIndex={0}
+                                  className={`w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
+                                />
+                                {error && (
+                                  <Tooltip content={error.message}>
+                                    <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <circle cx="8" cy="8" r="7" fill="#DC2626"/>
+                                        <path d="M8 4.5V9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                                        <circle cx="8" cy="11.5" r="0.75" fill="white"/>
+                                      </svg>
+                                    </span>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+            </table>
+            {visibleRows.length === 0 && (
+              <div className="p-8 text-center">
+                <span className="text-gray-500">
+                  {filterMode === 'error' ? 'No rows with errors found' : 
+                   filterMode === 'valid' ? 'No valid rows found' : 
+                   'No data to display'}
+                </span>
+              </div>
+            )}
           </div>
-        </form>
+      </div>
+
+      <div className={style.footerSection}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          size="default"
+        >
+          Back
+        </Button>
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          disabled={disableOnInvalidRows && errors.length > 0}
+          size="default"
+          variant="default"
+        >
+          Submit
+        </Button>
       </div>
 
       {/* Transform Modal */}
@@ -547,6 +560,6 @@ export default function Validation({
           }}
         />
       )}
-    </div>
+    </form>
   );
 }

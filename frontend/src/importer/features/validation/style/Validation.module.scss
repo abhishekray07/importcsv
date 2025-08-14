@@ -14,31 +14,46 @@ $text-secondary: #6b7280;
 $row-number-bg: #f9fafb;
 $focus-color: #3b82f6;
 
-// Base container - simple like Configure, no flex
+// Base container - flex layout for fixed header/footer with scrollable middle
 .validationContainer {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  min-height: 600px;
+  max-height: calc(100vh - 2rem);
+  height: calc(100vh - 2rem);
   max-width: 100%;
-  padding: 1.5rem;
   box-sizing: border-box;
   overflow: hidden; // Prevent children from expanding parent
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 640px) {
-    padding: 0.75rem;
-  }
+  margin: 1rem 0;
 }
 
 .header {
   @extend .headerSection;
+  flex-shrink: 0;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+// Toolbar section - fixed below header
+.toolbarSection {
+  flex-shrink: 0;
+  padding: 1rem 1.5rem 0 1.5rem;
+  background: transparent;
+}
+
+// Scrollable middle section - only for table
+.scrollableSection {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 200px; // Minimum height for usability
+  padding: 1rem 1.5rem;
 }
 
 .validationContent {
   // Don't extend scrollableContent - it has flex that causes expansion
-  padding: 1rem;
+  padding: 1rem 0;
   width: 100%;
   max-width: 100%;
   overflow: visible;
@@ -49,7 +64,8 @@ $focus-color: #3b82f6;
   background: transparent;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
+  margin-top: 0.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
@@ -159,6 +175,18 @@ $focus-color: #3b82f6;
       }
     }
   }
+}
+
+// Table scroll container
+.tableScrollContainer {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 // Spreadsheet Container - simple direct styles like Configure
@@ -497,4 +525,15 @@ $focus-color: #3b82f6;
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
   background: white;
+}
+
+// Footer section for buttons
+.footerSection {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: transparent;
 }

@@ -245,7 +245,8 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
           
           html, body {
             width: 100%;
-            height: 100%;
+            min-height: 100%;
+            height: auto;
             overflow: visible;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -256,6 +257,7 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
           body > div {
             width: 100%;
             min-height: 100%;
+            height: auto;
           }
           
           /* Ensure content can expand horizontally without iframe scrolling */
@@ -282,6 +284,7 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
         width: '100%',
         height: '100%',
         minHeight: '600px',
+        maxHeight: '100vh',
         border: 'none',
         display: 'block'
       }}
