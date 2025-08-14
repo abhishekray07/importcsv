@@ -22,11 +22,11 @@ $focus-color: #3b82f6;
   box-sizing: border-box;
   overflow: hidden; // Prevent children from expanding parent
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  
+
   @media (max-width: 768px) {
     padding: 1rem;
   }
-  
+
   @media (max-width: 640px) {
     padding: 0.75rem;
   }
@@ -44,14 +44,121 @@ $focus-color: #3b82f6;
   overflow: visible;
 }
 
-// Toolbar - use direct styles
+// Toolbar - with border and background
 .toolbar {
-  padding: 0.75rem 1rem;
-  background: white;
-  border: 1px solid $border-color;
+  background: transparent;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   margin-bottom: 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+// Error badge - prominent display
+.errorBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dc2626;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+// Row count - subtle display
+.rowCount {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+// Tab filter styles - seamless segmented control
+.tabFilter {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f4f6;
+  padding: 0.125rem;
+  border-radius: 2rem;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 1.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  margin: 0;
+
+  &:hover:not(.active) {
+    color: #374151;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px #3b82f6;
+    z-index: 1;
+  }
+
+  &.active {
+    background: #4b5563;
+    color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+    .count {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+  }
+
+  .count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    padding: 0.125rem 0.375rem;
+    height: 1.25rem;
+    background: transparent;
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  &.errorTab {
+    &.active {
+      background: #dc2626;
+
+      .count {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+    }
+
+    &:not(.active) {
+      .count {
+        color: #dc2626;
+      }
+    }
+  }
 }
 
 // Spreadsheet Container - simple direct styles like Configure
@@ -60,7 +167,7 @@ $focus-color: #3b82f6;
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  
+
   // Visual styles
   background: white;
   border: 1px solid $border-color;
@@ -87,7 +194,7 @@ $focus-color: #3b82f6;
   top: 0;
   z-index: 10;
   background: $header-bg;
-  
+
   tr {
     th {
       background: $header-bg;
@@ -98,7 +205,7 @@ $focus-color: #3b82f6;
       font-weight: 600;
       color: $text-primary;
       position: relative;
-      
+
       &:last-child {
         border-right: none;
       }
@@ -122,7 +229,7 @@ $focus-color: #3b82f6;
 .columnHeader {
   width: auto;
   min-width: 100px;
-  
+
   .headerContent {
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
@@ -140,12 +247,12 @@ $focus-color: #3b82f6;
       .dataCell {
         background: $hover-bg;
       }
-      
+
       .rowNumber {
         background: darken($row-number-bg, 3%);
       }
     }
-    
+
     &.errorRow {
       .dataCell {
         background: lighten($error-bg, 3%);
@@ -181,14 +288,14 @@ $focus-color: #3b82f6;
   position: relative;
   transition: background-color 0.15s ease;
   white-space: nowrap;
-  
+
   &:last-child {
     border-right: none;
   }
-  
+
   &.errorCell {
     background: $error-bg;
-    
+
     .cellInput {
       color: $text-primary;
     }
@@ -219,13 +326,13 @@ $focus-color: #3b82f6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+
   &:focus {
     box-shadow: inset 0 0 0 2px $focus-color;
     z-index: 2;
     position: relative;
   }
-  
+
   &:hover {
     background: rgba(0, 0, 0, 0.01);
   }
@@ -241,7 +348,7 @@ $focus-color: #3b82f6;
   justify-content: center;
   cursor: help;
   z-index: 3;
-  
+
   svg {
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
@@ -298,7 +405,7 @@ $focus-color: #3b82f6;
   border-radius: 4px;
   font-size: 0.875rem;
   transition: all 0.2s;
-  
+
   &:focus {
     border-color: #3182ce;
     box-shadow: 0 0 0 1px #3182ce;
@@ -307,7 +414,7 @@ $focus-color: #3b82f6;
 
 .errorInput {
   border-color: #e53e3e;
-  
+
   &:focus {
     border-color: #e53e3e;
     box-shadow: 0 0 0 1px #e53e3e;

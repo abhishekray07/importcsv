@@ -132,6 +132,110 @@ export default function IframeWrapper({ children, className = '' }: IframeWrappe
             --radius: 0.5rem;
           }
           
+          /* Tailwind utility classes for components */
+          .bg-primary {
+            background-color: hsl(var(--primary));
+          }
+          
+          .bg-input {
+            background-color: hsl(var(--input));
+          }
+          
+          .bg-background {
+            background-color: hsl(var(--background));
+          }
+          
+          .bg-popover {
+            background-color: hsl(var(--popover));
+          }
+          
+          .text-popover-foreground {
+            color: hsl(var(--popover-foreground));
+          }
+          
+          .ring-ring {
+            --tw-ring-color: hsl(var(--ring));
+          }
+          
+          .ring-offset-background {
+            --tw-ring-offset-color: hsl(var(--background));
+          }
+          
+          /* Transitions and transforms */
+          .transition-colors {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+          }
+          
+          .transition-transform {
+            transition-property: transform;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+          }
+          
+          .translate-x-0 {
+            transform: translateX(0);
+          }
+          
+          .translate-x-5 {
+            transform: translateX(1.25rem);
+          }
+          
+          /* Focus states */
+          .focus-visible\:outline-none:focus-visible {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+          }
+          
+          .focus-visible\:ring-2:focus-visible {
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+          }
+          
+          .focus-visible\:ring-offset-2:focus-visible {
+            --tw-ring-offset-width: 2px;
+          }
+          
+          /* Data attribute selectors for Radix UI components */
+          [data-state="checked"] {
+            background-color: hsl(var(--primary));
+          }
+          
+          [data-state="unchecked"] {
+            background-color: hsl(var(--input));
+          }
+          
+          [data-state="checked"] .translate-x-5 {
+            transform: translateX(1.25rem);
+          }
+          
+          [data-state="unchecked"] .translate-x-0 {
+            transform: translateX(0);
+          }
+          
+          /* Disabled states */
+          .disabled\:cursor-not-allowed:disabled {
+            cursor: not-allowed;
+          }
+          
+          .disabled\:opacity-50:disabled {
+            opacity: 0.5;
+          }
+          
+          /* Additional utility classes */
+          .shadow-lg {
+            --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+          }
+          
+          .ring-0 {
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+          }
+          
           /* Reset styles to ensure clean slate */
           * {
             margin: 0;

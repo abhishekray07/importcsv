@@ -3,7 +3,7 @@ import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { Alert, AlertTitle, AlertDescription } from '../../components/ui/alert';
 import { Tooltip } from '../../components/ui/tooltip';
-import { PiSparkle, PiWarning } from 'react-icons/pi';
+import { PiWrench, PiWarning } from 'react-icons/pi';
 import { ValidationProps } from './types';
 import TransformModal from './components/TransformModal';
 import style from './style/Validation.module.scss';
@@ -25,7 +25,7 @@ export default function Validation({
 }: ValidationProps) {
   // State management
   const [errors, setErrors] = useState<Array<{rowIndex: number, columnIndex: number, message: string}>>([]);
-  const [showOnlyErrors, setShowOnlyErrors] = useState(false);
+  const [filterMode, setFilterMode] = useState<'all' | 'valid' | 'error'>('all');
   const [isTransformModalOpen, setIsTransformModalOpen] = useState(false);
 
   // Data extraction
@@ -255,15 +255,30 @@ export default function Validation({
     shouldValidateRef.current = true;
   }, [dataRows]);
 
-  // Row filtering
-  const visibleRows = useMemo(() => {
-    if (!showOnlyErrors) return dataRows;
-
-    return dataRows.filter((_, rowIdx) => {
-      const displayRowIndex = rowIdx + headerRowIndex + 1;
-      return errors.some(err => err.rowIndex === displayRowIndex);
-    });
-  }, [dataRows, showOnlyErrors, errors, headerRowIndex]);
+  // Row filtering with counts
+  const { visibleRows, validCount, errorCount } = useMemo(() => {
+    const errorRowIndices = new Set(
+      errors.map(err => err.rowIndex - headerRowIndex - 1)
+    );
+    
+    const validRows = dataRows.filter((_, idx) => !errorRowIndices.has(idx));
+    const errorRows = dataRows.filter((_, idx) => errorRowIndices.has(idx));
+    
+    let filtered: typeof dataRows;
+    if (filterMode === 'valid') {
+      filtered = validRows;
+    } else if (filterMode === 'error') {
+      filtered = errorRows;
+    } else {
+      filtered = dataRows;
+    }
+    
+    return {
+      visibleRows: filtered,
+      validCount: validRows.length,
+      errorCount: errorRows.length
+    };
+  }, [dataRows, filterMode, errors, headerRowIndex]);
 
   // Error tracking
   const errorTracking = useMemo(() => {
@@ -327,36 +342,40 @@ export default function Validation({
 
         <div className={style.toolbar}>
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center">
-                <Switch
-                  id="show-errors-only"
-                  checked={showOnlyErrors}
-                  onCheckedChange={setShowOnlyErrors}
-                  className="mr-2"
-                />
-                <label htmlFor="show-errors-only" className="text-sm font-medium">Show only rows with errors</label>
-              </div>
-              {errors.length > 0 && (
-                <span className="text-sm text-red-500 font-medium">
-                  {errors.length} {errors.length === 1 ? 'error' : 'errors'} found
-                </span>
-              )}
+            <div className={style.tabFilter}>
+              <button
+                className={`${style.tab} ${filterMode === 'all' ? style.active : ''}`}
+                onClick={() => setFilterMode('all')}
+              >
+                All <span className={style.count}>{dataRows.length}</span>
+              </button>
+              <button
+                className={`${style.tab} ${filterMode === 'valid' ? style.active : ''}`}
+                onClick={() => setFilterMode('valid')}
+              >
+                Valid <span className={style.count}>{validCount}</span>
+              </button>
+              <button
+                className={`${style.tab} ${style.errorTab} ${filterMode === 'error' ? style.active : ''}`}
+                onClick={() => setFilterMode('error')}
+              >
+                Error <span className={style.count}>{errorCount}</span>
+              </button>
             </div>
-            <div className="flex gap-2 items-center">
-              {backendUrl && importerKey && (
-                <Button
-                  size="sm"
-                  onClick={() => setIsTransformModalOpen(true)}
-                  variant="outline"
-                >
-                  <PiSparkle className="mr-2 h-4 w-4" />
-                  Transform with AI
-                </Button>
+            <div className="flex gap-3 items-center">
+              {backendUrl && importerKey && errorCount > 0 && (
+                <Tooltip content="Use AI to automatically fix validation errors">
+                  <Button
+                    size="sm"
+                    onClick={() => setIsTransformModalOpen(true)}
+                    variant="default"
+                    className="shadow-sm"
+                  >
+                    <PiWrench className="mr-2 h-4 w-4" />
+                    Fix errors
+                  </Button>
+                </Tooltip>
               )}
-              <span className="text-xs text-gray-500">
-                {visibleRows.length} of {dataRows.length} rows
-              </span>
             </div>
           </div>
         </div>
@@ -425,7 +444,9 @@ export default function Validation({
           {visibleRows.length === 0 && (
             <div className="p-8 text-center">
               <span className="text-gray-500">
-                {showOnlyErrors ? 'No rows with errors found' : 'No data to display'}
+                {filterMode === 'error' ? 'No rows with errors found' : 
+                 filterMode === 'valid' ? 'No valid rows found' : 
+                 'No data to display'}
               </span>
             </div>
           )}
